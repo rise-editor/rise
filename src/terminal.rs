@@ -4,14 +4,14 @@ use crossterm::{
     execute,
     cursor::MoveTo, terminal::{Clear, ClearType},
     event::{Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, read, KeyEventState},
-    terminal::{EnterAlternateScreen, LeaveAlternateScreen, enable_raw_mode, disable_raw_mode},
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen, enable_raw_mode, disable_raw_mode, size},
 };
 
-use crate::buffer::Buffer;
+use crate::{window::{Window, Size}, buffer::BufferMode};
 
 pub struct Terminal {
     pub stdout: Stdout,
-    pub buffer: Buffer,
+    pub window: Window,
     pub stop_requested: bool,
 }
 
@@ -19,8 +19,7 @@ impl Terminal {
     pub fn start(&mut self) {
         enable_raw_mode().unwrap();
         execute!(self.stdout, EnterAlternateScreen).unwrap();
-        self.clear_all();
-        self.move_to_cursor();
+        self.redraw_all();
         self.stop_requested = false;
     }
 
@@ -39,26 +38,86 @@ impl Terminal {
     }
 
     pub fn move_to_cursor(&self) {
-        self.move_to(self.buffer.cursor.row as u16, self.buffer.cursor.column as u16);
+        let cursor_position = self.window.get_active_buffer_cursor_position();
+        self.move_to(cursor_position.y, cursor_position.x + 4);
+    }
+
+    pub fn redraw_statusbar(&mut self) {
+        self.move_to(self.window.position.y + self.window.size.height + 1, self.window.position.x);
+        let active_buffer = self.window.get_active_buffer();
+        print!("{} ({}x{})", active_buffer.mode, active_buffer.cursor.column + 1, active_buffer.cursor.row + 1);
+        self.stdout.flush().unwrap();
     }
 
     pub fn redraw_all(&mut self) {
         self.clear_all();
-        for (i, line) in self.buffer.lines.iter().enumerate() {
-            self.move_to(i as u16, 0);
-            println!("{}", line);
+        for (i, line) in self.window.get_active_buffer().lines.iter().enumerate() {
+            self.move_to(self.window.position.y + i as u16, self.window.position.x);
+            println!("{:^3} {}", i + 1, line);
         }
+        self.redraw_statusbar();
         self.move_to_cursor();
     }
 
-    pub fn read(&self) -> Option<KeyEvent> {
+    pub fn get_terminal_size() -> Size {
+        let (columns, rows) = size().unwrap();
+        Size { width: columns, height: rows }
+    }
+
+    pub fn read(&mut self) -> Option<KeyEvent> {
         let event = read().unwrap();
 
-        if let Event::Key(key_event) = event {
-            Some(key_event)
-        } else {
-            None
+        match event {
+            Event::Key(key_event) => Some(key_event),
+            Event::Resize(columns, rows) => {
+                self.window.size.width = columns;
+                self.window.size.height = rows - 2;
+                self.redraw_all();
+                None
+            },
+            _ => None
         }
+    }
+
+    pub fn handle_key_press_normal(&mut self, event: KeyEvent) {
+        match event.code {
+            KeyCode::Left => self.window.get_active_buffer_mut().move_left(),
+            KeyCode::Right => self.window.get_active_buffer_mut().move_right(),
+            KeyCode::Up => self.window.get_active_buffer_mut().move_up(),
+            KeyCode::Down => self.window.get_active_buffer_mut().move_down(),
+
+            KeyCode::Char('h') => self.window.get_active_buffer_mut().move_left(),
+            KeyCode::Char('j') => self.window.get_active_buffer_mut().move_down(),
+            KeyCode::Char('k') => self.window.get_active_buffer_mut().move_up(),
+            KeyCode::Char('l') => self.window.get_active_buffer_mut().move_right(),
+
+            KeyCode::Char('i') => self.window.get_active_buffer_mut().enter_insert_mode(),
+
+            KeyCode::Esc => self.stop_requested = true,
+            _ => {},
+        };
+    }
+
+    pub fn handle_key_press_insert(&mut self, event: KeyEvent) {
+        match event.code {
+            KeyCode::Char(ch) => self.window.get_active_buffer_mut().insert_char(ch),
+            KeyCode::Tab => {
+                self.window.get_active_buffer_mut().insert_char(' ');
+                self.window.get_active_buffer_mut().insert_char(' ');
+            },
+            KeyCode::Enter => self.window.get_active_buffer_mut().insert_newline(),
+
+            KeyCode::Backspace => self.window.get_active_buffer_mut().delete_char(),
+            KeyCode::Delete => {},
+
+            KeyCode::Left => self.window.get_active_buffer_mut().move_left(),
+            KeyCode::Right => self.window.get_active_buffer_mut().move_right(),
+            KeyCode::Up => self.window.get_active_buffer_mut().move_up(),
+            KeyCode::Down => self.window.get_active_buffer_mut().move_down(),
+
+            KeyCode::Esc => self.window.get_active_buffer_mut().enter_normal_mode(),
+            _ => todo!(),
+        };
     }
 
     pub fn handle_key_press(&mut self, event: KeyEvent) {
@@ -71,29 +130,15 @@ impl Terminal {
 
         if event == save_key_event {
             let mut file = File::create("/tmp/editorise.txt").unwrap();
-            file.write_all(self.buffer.get_content().as_bytes()).unwrap();
+            file.write_all(self.window.get_active_buffer().get_content().as_bytes()).unwrap();
             return;
         }
 
-        match event.code {
-            KeyCode::Char(ch) => self.buffer.insert_char(ch),
-            KeyCode::Tab => {
-                self.buffer.insert_char(' ');
-                self.buffer.insert_char(' ');
-            },
-            KeyCode::Enter => self.buffer.insert_newline(),
-
-            KeyCode::Backspace => self.buffer.delete_char(),
-            KeyCode::Delete => {},
-
-            KeyCode::Left => self.buffer.move_left(),
-            KeyCode::Right => self.buffer.move_right(),
-            KeyCode::Up => self.buffer.move_up(),
-            KeyCode::Down => self.buffer.move_down(),
-
-            KeyCode::Esc => self.stop_requested = true,
+        match self.window.get_active_buffer().mode {
+            BufferMode::Normal => self.handle_key_press_normal(event),
+            BufferMode::Insert => self.handle_key_press_insert(event),
             _ => todo!(),
-        };
+        }
 
         self.redraw_all();
     }

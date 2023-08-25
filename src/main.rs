@@ -1,14 +1,14 @@
-pub mod cursor;
 pub mod buffer;
+pub mod core;
 pub mod terminal;
 pub mod window;
 
 use std::io::stdout;
 
-use cursor::Cursor;
-use buffer::{Buffer, BufferMode};
-use terminal::Terminal;
-use window::{Window, Size, Point};
+use crate::buffer::{mode::BufferMode, Buffer};
+use crate::core::{Point, Size};
+use crate::terminal::Terminal;
+use crate::window::Window;
 
 fn main() {
     let stdout = stdout();
@@ -16,20 +16,19 @@ fn main() {
     let terminal_size = Terminal::get_terminal_size();
 
     let mut window = Window {
-        position: Point {
-            x: 0,
-            y: 1,
-        },
+        position: Point { x: 5, y: 5 },
         size: Size {
-            width: terminal_size.width,
-            height: terminal_size.height - 2,
+            width: terminal_size.width / 4,
+            height: terminal_size.height / 2 - 2,
         },
         buffers: vec![],
     };
 
     let buffer = Buffer {
         mode: BufferMode::Normal,
-        cursor: Cursor{ row: 0, column: 0 },
+        visible_area: Size { width: terminal_size.width / 4, height: terminal_size.height / 2 - 2 },
+        scroll: Point { x: 0, y: 0 },
+        cursor: Point { x: 0, y: 0 },
         lines: vec![String::new()],
     };
 

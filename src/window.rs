@@ -1,18 +1,11 @@
-use crate::buffer::Buffer;
-
-pub struct Point {
-    pub x: u16,
-    pub y: u16,
-}
-
-pub struct Size {
-    pub width: u16,
-    pub height: u16,
-}
+use crate::{
+    buffer::Buffer,
+    core::{Point, Size},
+};
 
 pub struct Window {
-    pub position: Point,
-    pub size: Size,
+    pub position: Point<u16>,
+    pub size: Size<u16>,
     pub buffers: Vec<Buffer>,
 }
 
@@ -25,10 +18,21 @@ impl Window {
         self.buffers.get_mut(0).unwrap()
     }
 
-    pub fn get_active_buffer_cursor_position(&self) -> Point {
-        Point {
-            x: self.position.x + self.get_active_buffer().cursor.column as u16,
-            y: self.position.y + self.get_active_buffer().cursor.row as u16,
+    pub fn set_size(&mut self, width: u16, height: u16) {
+        self.size.width = width;
+        self.size.height = height;
+
+        for buffer in self.buffers.iter_mut() {
+            buffer.visible_area.width = width;
+            buffer.visible_area.height = height;
         }
+    }
+
+    pub fn get_active_buffer_visible_x(&self, column: usize) -> u16 {
+        self.position.x + self.get_active_buffer().column_to_visible_x(column)
+    }
+
+    pub fn get_active_buffer_visible_y(&self, row: usize) -> u16 {
+        self.position.y + self.get_active_buffer().row_to_visible_y(row)
     }
 }

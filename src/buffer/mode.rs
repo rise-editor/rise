@@ -17,6 +17,12 @@ impl Display for BufferMode {
 
 impl Buffer {
     pub fn enter_normal_mode(&mut self) {
+        if let BufferMode::Insert = self.mode {
+            if self.cursor.x > 0 {
+                self.move_cursor(self.cursor.y, self.cursor.x - 1);
+            }
+        }
+
         self.mode = BufferMode::Normal;
     }
 

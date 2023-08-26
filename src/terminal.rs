@@ -4,7 +4,7 @@ use std::{
 };
 
 use crossterm::{
-    cursor::MoveTo,
+    cursor::{MoveTo, SetCursorStyle},
     event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers},
     execute,
     terminal::{
@@ -69,7 +69,7 @@ impl Terminal {
 
     pub fn redraw_all(&mut self) {
         let buffer = self.window.get_active_buffer();
-        let line_count = buffer.get_line_count();
+        let line_count = buffer.get_row_count();
 
         self.clear_all();
         for line_index in buffer.scroll.y..(buffer.scroll.y + buffer.visible_area.height as usize) {
@@ -86,6 +86,14 @@ impl Terminal {
         }
         self.redraw_statusbar();
         self.move_to_cursor();
+    }
+
+    pub fn set_cursor_blinking_block(&mut self) {
+        execute!(self.stdout, SetCursorStyle::BlinkingBlock).unwrap();
+    }
+
+    pub fn set_cursor_blinking_bar(&mut self) {
+        execute!(self.stdout, SetCursorStyle::BlinkingBar).unwrap();
     }
 
     pub fn get_terminal_size() -> Size<u16> {
@@ -122,7 +130,15 @@ impl Terminal {
             KeyCode::Char('k') => self.window.get_active_buffer_mut().move_up(),
             KeyCode::Char('l') => self.window.get_active_buffer_mut().move_right(),
 
-            KeyCode::Char('i') => self.window.get_active_buffer_mut().enter_insert_mode(),
+            KeyCode::Char('g') => self.window.get_active_buffer_mut().move_first_row(),
+            KeyCode::Char('G') => self.window.get_active_buffer_mut().move_last_row(),
+            KeyCode::Char('0') => self.window.get_active_buffer_mut().move_first_column(),
+            KeyCode::Char('$') => self.window.get_active_buffer_mut().move_last_column(),
+
+            KeyCode::Char('i') => {
+                self.window.get_active_buffer_mut().enter_insert_mode();
+                self.set_cursor_blinking_bar();
+            },
 
             KeyCode::Esc => self.stop_requested = true,
             _ => {}
@@ -146,7 +162,10 @@ impl Terminal {
             KeyCode::Up => self.window.get_active_buffer_mut().move_up(),
             KeyCode::Down => self.window.get_active_buffer_mut().move_down(),
 
-            KeyCode::Esc => self.window.get_active_buffer_mut().enter_normal_mode(),
+            KeyCode::Esc => {
+                self.window.get_active_buffer_mut().enter_normal_mode();
+                self.set_cursor_blinking_block();
+            },
             _ => todo!(),
         };
     }

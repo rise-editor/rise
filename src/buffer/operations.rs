@@ -4,8 +4,8 @@ impl Buffer {
     pub fn insert_char(&mut self, ch: char) {
         let column = self.cursor.x;
 
-        let current_line = self.get_current_line_mut();
-        current_line.insert(column, ch);
+        let line = self.get_current_line_mut();
+        line.insert(column, ch);
 
         self.move_right();
     }
@@ -17,7 +17,7 @@ impl Buffer {
 
         if self.cursor.x == 0 {
             self.move_up();
-            self.move_line_end();
+            self.move_last_column();
 
             self.join_lines(self.cursor.y, self.cursor.y + 1);
         } else {
@@ -43,7 +43,7 @@ impl Buffer {
         self.lines.insert(row + 1, right_string);
 
         self.move_down();
-        self.move_line_start();
+        self.move_first_column();
     }
 
     pub fn join_lines(&mut self, row1: usize, row2: usize) {
@@ -51,5 +51,12 @@ impl Buffer {
         let line1 = self.get_line_mut(row1);
         line1.push_str(&line2);
         self.lines.remove(row2);
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    #[test]
+    pub fn join_lines_test() {
     }
 }

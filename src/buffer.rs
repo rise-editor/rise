@@ -1,6 +1,7 @@
-pub mod handle_key;
 pub mod mode;
-pub mod move_cursor;
+pub mod movement;
+pub mod operations;
+pub mod paint_helper;
 pub mod text;
 
 use crate::core::{Point, Size};
@@ -13,14 +14,4 @@ pub struct Buffer {
     pub scroll: Point<usize>,
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
-}
-
-impl Buffer {
-    pub fn column_to_visible_x(&self, column: usize) -> u16 {
-        (column - self.scroll.x) as u16
-    }
-
-    pub fn row_to_visible_y(&self, row: usize) -> u16 {
-        (row - self.scroll.y) as u16
-    }
 }

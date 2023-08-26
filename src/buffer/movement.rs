@@ -54,7 +54,7 @@ impl Buffer {
     }
 
     pub fn move_last_column(&mut self) {
-        self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.x));
+        self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.y));
     }
 }
 
@@ -65,9 +65,8 @@ pub mod tests {
         core::{Point, Size},
     };
 
-    #[test]
-    pub fn move_tests() {
-        let mut buffer = Buffer {
+    fn create_buffer() -> Buffer {
+        Buffer {
             mode: BufferMode::Normal,
             scroll: Point { x: 0, y: 0 },
             cursor: Point { x: 0, y: 0 },
@@ -75,12 +74,16 @@ pub mod tests {
                 width: 5,
                 height: 5,
             },
-            lines: vec![
-                String::from("1234567890"),
-                String::from("abcde"),
-                String::new(),
-            ],
-        };
+            lines: vec![],
+        }
+    }
+
+    #[test]
+    pub fn move_tests() {
+        let mut buffer = create_buffer();
+        buffer.lines.push(String::from("1234567890"));
+        buffer.lines.push(String::from("abcde"));
+        buffer.lines.push(String::new());
 
         buffer.move_up();
         buffer.move_up();
@@ -123,5 +126,19 @@ pub mod tests {
         assert_eq!("67890", buffer.get_line_visible_text(0));
         assert_eq!("", buffer.get_line_visible_text(1));
         assert_eq!("", buffer.get_line_visible_text(2));
+    }
+
+    #[test]
+    pub fn move_last_column_test() {
+        let mut buffer = create_buffer();
+        buffer.lines.push(String::new());
+        buffer.enter_insert_mode();
+        buffer.insert_char('1');
+        buffer.insert_char('2');
+        buffer.insert_char('3');
+        buffer.insert_char('4');
+        buffer.insert_char('4');
+        buffer.enter_normal_mode();
+        buffer.move_last_column();
     }
 }

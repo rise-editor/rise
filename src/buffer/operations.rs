@@ -2,39 +2,57 @@ use crate::buffer::Buffer;
 
 impl Buffer {
     pub fn insert_char(&mut self, ch: char) {
-        let column = self.cursor.x;
+        self.insert_char_to(self.cursor.y, self.cursor.x, ch);
+    }
 
-        let line = self.get_current_line_mut();
+    pub fn insert_char_to(&mut self, row: usize, column: usize, ch: char) {
+        let line = self.get_line_mut(row);
         line.insert(column, ch);
 
-        self.move_right();
+        self.move_cursor(row, column + 1);
     }
 
     pub fn delete_char(&mut self) {
-        if self.cursor.y == 0 && self.cursor.x == 0 {
+        self.delete_char_from(self.cursor.y, self.cursor.x);
+    }
+
+    pub fn delete_char_from(&mut self, row: usize, column: usize) {
+        let line = self.get_line_mut(row);
+        if line.len() == 0 {
             return;
-        }
-
-        if self.cursor.x == 0 {
-            self.move_up();
-            self.move_last_column();
-
-            self.join_lines(self.cursor.y, self.cursor.y + 1);
+        } else if line.len() == column {
+            if row + 1 < self.get_row_count() {
+                self.join_lines(row, row + 1);
+            }
         } else {
-            let char_index = self.cursor.x - 1;
-            let current_line = self.get_current_line_mut();
-            current_line.remove(char_index);
-
-            self.move_left();
+            line.remove(column);
+            self.move_cursor(row, column);
         }
     }
 
-    pub fn insert_newline(&mut self) {
-        let column = self.cursor.x;
-        let row = self.cursor.y;
+    pub fn delete_char_before(&mut self, row: usize, column: usize) {
+        if row == 0 && column == 0 {
+            return;
+        }
 
-        let current_line = self.get_current_line();
-        let (left, right) = current_line.split_at(column);
+        if column == 0 {
+            self.move_up();
+            self.move_last_column();
+            self.join_lines(row - 1, row);
+        } else {
+            self.move_left();
+            self.delete_char();
+        }
+    }
+
+    pub fn insert_newline(&mut self, row: usize) {
+        self.lines.insert(row, String::new());
+        self.move_cursor(row, 0);
+    }
+
+    pub fn split_line(&mut self, row: usize, column: usize) {
+        let line = self.get_line(row);
+        let (left, right) = line.split_at(column);
 
         let left_string = left.to_string();
         let right_string = right.to_string();
@@ -42,8 +60,7 @@ impl Buffer {
         self.lines[row] = left_string;
         self.lines.insert(row + 1, right_string);
 
-        self.move_down();
-        self.move_first_column();
+        self.move_cursor(row + 1, 0);
     }
 
     pub fn join_lines(&mut self, row1: usize, row2: usize) {

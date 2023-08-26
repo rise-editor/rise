@@ -118,54 +118,86 @@ impl Terminal {
         }
     }
 
+    pub fn enter_normal_mode(&mut self) {
+        self.window.get_active_buffer_mut().enter_normal_mode();
+        self.set_cursor_blinking_block();
+    }
+
+    pub fn enter_insert_mode(&mut self) {
+        self.window.get_active_buffer_mut().enter_insert_mode();
+        self.set_cursor_blinking_bar();
+    }
+
+    pub fn enter_insert_mode_after(&mut self) {
+        self.window.get_active_buffer_mut().enter_insert_mode_after();
+        self.set_cursor_blinking_bar();
+    }
+
     pub fn handle_key_press_normal(&mut self, event: KeyEvent) {
+        let buffer = self.window.get_active_buffer_mut();
+
         match event.code {
-            KeyCode::Left => self.window.get_active_buffer_mut().move_left(),
-            KeyCode::Right => self.window.get_active_buffer_mut().move_right(),
-            KeyCode::Up => self.window.get_active_buffer_mut().move_up(),
-            KeyCode::Down => self.window.get_active_buffer_mut().move_down(),
+            KeyCode::Esc => self.stop_requested = true,
 
-            KeyCode::Char('h') => self.window.get_active_buffer_mut().move_left(),
-            KeyCode::Char('j') => self.window.get_active_buffer_mut().move_down(),
-            KeyCode::Char('k') => self.window.get_active_buffer_mut().move_up(),
-            KeyCode::Char('l') => self.window.get_active_buffer_mut().move_right(),
+            KeyCode::Left => buffer.move_left(),
+            KeyCode::Right => buffer.move_right(),
+            KeyCode::Up => buffer.move_up(),
+            KeyCode::Down => buffer.move_down(),
 
-            KeyCode::Char('g') => self.window.get_active_buffer_mut().move_first_row(),
-            KeyCode::Char('G') => self.window.get_active_buffer_mut().move_last_row(),
-            KeyCode::Char('0') => self.window.get_active_buffer_mut().move_first_column(),
-            KeyCode::Char('$') => self.window.get_active_buffer_mut().move_last_column(),
+            KeyCode::Char('h') => buffer.move_left(),
+            KeyCode::Char('j') => buffer.move_down(),
+            KeyCode::Char('k') => buffer.move_up(),
+            KeyCode::Char('l') => buffer.move_right(),
 
+            KeyCode::Char('g') => buffer.move_first_row(),
+            KeyCode::Char('G') => buffer.move_last_row(),
+            KeyCode::Char('0') => buffer.move_first_column(),
+            KeyCode::Char('$') => buffer.move_last_column(),
+                 
+            KeyCode::Char('a') => self.enter_insert_mode_after(),
+            KeyCode::Char('A') => {
+                buffer.move_last_column();
+                self.enter_insert_mode_after();
+            },
             KeyCode::Char('i') => {
-                self.window.get_active_buffer_mut().enter_insert_mode();
+                buffer.enter_insert_mode();
                 self.set_cursor_blinking_bar();
             },
+            KeyCode::Char('o') => {
+                buffer.insert_newline(buffer.cursor.y + 1);
+                self.enter_insert_mode();
+            }
+            KeyCode::Char('O') => {
+                buffer.insert_newline(buffer.cursor.y);
+                self.enter_insert_mode();
+            },
 
-            KeyCode::Esc => self.stop_requested = true,
+            KeyCode::Char('x') => buffer.delete_char(),
+
             _ => {}
         };
     }
 
     pub fn handle_key_press_insert(&mut self, event: KeyEvent) {
+        let buffer = self.window.get_active_buffer_mut();
+
         match event.code {
-            KeyCode::Char(ch) => self.window.get_active_buffer_mut().insert_char(ch),
+            KeyCode::Char(ch) => buffer.insert_char(ch),
             KeyCode::Tab => {
-                self.window.get_active_buffer_mut().insert_char(' ');
-                self.window.get_active_buffer_mut().insert_char(' ');
+                buffer.insert_char(' ');
+                buffer.insert_char(' ');
             }
-            KeyCode::Enter => self.window.get_active_buffer_mut().insert_newline(),
+            KeyCode::Enter => buffer.split_line(buffer.cursor.y, buffer.cursor.x),
 
-            KeyCode::Backspace => self.window.get_active_buffer_mut().delete_char(),
-            KeyCode::Delete => {}
+            KeyCode::Backspace => buffer.delete_char_before(buffer.cursor.y, buffer.cursor.x),
+            KeyCode::Delete => buffer.delete_char(),
 
-            KeyCode::Left => self.window.get_active_buffer_mut().move_left(),
-            KeyCode::Right => self.window.get_active_buffer_mut().move_right(),
-            KeyCode::Up => self.window.get_active_buffer_mut().move_up(),
-            KeyCode::Down => self.window.get_active_buffer_mut().move_down(),
+            KeyCode::Left => buffer.move_left(),
+            KeyCode::Right => buffer.move_right(),
+            KeyCode::Up => buffer.move_up(),
+            KeyCode::Down => buffer.move_down(),
 
-            KeyCode::Esc => {
-                self.window.get_active_buffer_mut().enter_normal_mode();
-                self.set_cursor_blinking_block();
-            },
+            KeyCode::Esc => self.enter_normal_mode(),
             _ => todo!(),
         };
     }

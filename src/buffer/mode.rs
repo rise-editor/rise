@@ -29,4 +29,9 @@ impl Buffer {
     pub fn enter_insert_mode(&mut self) {
         self.mode = BufferMode::Insert;
     }
+
+    pub fn enter_insert_mode_after(&mut self) {
+        self.mode = BufferMode::Insert;
+        self.move_right();
+    }
 }

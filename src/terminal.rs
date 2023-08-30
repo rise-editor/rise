@@ -144,6 +144,8 @@ impl Terminal {
             KeyCode::Up => buffer.move_up(),
             KeyCode::Down => buffer.move_down(),
 
+            KeyCode::Char('w') => buffer.move_to_next_word_start(),
+
             KeyCode::Char('h') => buffer.move_left(),
             KeyCode::Char('j') => buffer.move_down(),
             KeyCode::Char('k') => buffer.move_up(),
@@ -158,6 +160,11 @@ impl Terminal {
             KeyCode::Char('A') => {
                 buffer.move_last_column();
                 self.enter_insert_mode_after();
+            },
+            KeyCode::Char('s') => {
+                self.enter_insert_mode();
+                let b = self.window.get_active_buffer_mut();
+                b.delete_char_before(b.cursor.y, b.cursor.y);
             },
             KeyCode::Char('i') => {
                 buffer.enter_insert_mode();

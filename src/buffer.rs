@@ -1,3 +1,4 @@
+pub mod find;
 pub mod mode;
 pub mod movement;
 pub mod operations;

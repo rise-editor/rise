@@ -44,15 +44,35 @@ impl Terminal {
     }
 
     pub fn move_to_cursor(&self) {
-        let x = self.window.get_active_buffer_visible_x(self.window.get_active_buffer().cursor.x);
-        let y = self.window.get_active_buffer_visible_y(self.window.get_active_buffer().cursor.y);
+        let buffer = self.window.get_active_buffer();
 
-        self.move_to(y, x + 4);
+        let x;
+        let y;
+
+        if buffer.mode == BufferMode::Command {
+            x = self.window.position.x + buffer.command_line.cursor_x as u16 + 1; // TODO: Make command line scrollable
+            y = self.window.get_active_buffer_visible_y(buffer.visible_area.height as usize - 2);
+        } else {
+            x = self.window.get_active_buffer_visible_x(buffer.cursor.x) + 4;
+            y = self.window.get_active_buffer_visible_y(buffer.cursor.y);
+        }
+
+        self.move_to(y, x);
+    }
+
+    pub fn redraw_command_line(&mut self) {
+        if self.window.get_active_buffer().mode == BufferMode::Command {
+            self.move_to(
+                self.window.position.y + self.window.size.height - 2,
+                self.window.position.x,
+            );
+            print!(":{}", self.window.get_active_buffer().command_line.text);
+        }
     }
 
     pub fn redraw_statusbar(&mut self) {
         self.move_to(
-            self.window.position.y + self.window.size.height,
+            self.window.position.y + self.window.size.height - 1,
             self.window.position.x,
         );
         let active_buffer = self.window.get_active_buffer();
@@ -84,6 +104,7 @@ impl Terminal {
                 println!("~");
             }
         }
+        self.redraw_command_line();
         self.redraw_statusbar();
         self.move_to_cursor();
     }
@@ -181,6 +202,8 @@ impl Terminal {
 
             KeyCode::Char('x') => buffer.delete_char(),
 
+            KeyCode::Char(':') => buffer.enter_command_mode(),
+
             _ => {}
         };
     }
@@ -209,6 +232,24 @@ impl Terminal {
         };
     }
 
+    pub fn handle_key_press_command(&mut self, event: KeyEvent) {
+        let buffer = self.window.get_active_buffer_mut();
+
+        match event.code {
+            KeyCode::Char(ch) => buffer.command_line.insert_key(ch),
+            KeyCode::Enter => { },
+
+            KeyCode::Backspace => buffer.command_line.delete_key(),
+            KeyCode::Delete => buffer.command_line.delete_key(),
+
+            KeyCode::Left => buffer.command_line.move_left(),
+            KeyCode::Right => buffer.command_line.move_right(),
+
+            KeyCode::Esc => self.enter_normal_mode(),
+            _ => todo!(),
+        };
+    }
+
     pub fn handle_key_press(&mut self, event: KeyEvent) {
         let save_key_event = KeyEvent {
             modifiers: KeyModifiers::CONTROL,
@@ -226,6 +267,7 @@ impl Terminal {
         match self.window.get_active_buffer().mode {
             BufferMode::Normal => self.handle_key_press_normal(event),
             BufferMode::Insert => self.handle_key_press_insert(event),
+            BufferMode::Command => self.handle_key_press_command(event),
             _ => todo!(),
         }
 

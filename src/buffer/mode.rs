@@ -2,11 +2,12 @@ use std::fmt::{Display, Formatter, Result};
 
 use super::Buffer;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum BufferMode {
     Normal,
     Insert,
     Visual,
+    Command,
 }
 
 impl Display for BufferMode {
@@ -33,5 +34,10 @@ impl Buffer {
     pub fn enter_insert_mode_after(&mut self) {
         self.mode = BufferMode::Insert;
         self.move_right();
+    }
+
+    pub fn enter_command_mode(&mut self) {
+        self.mode = BufferMode::Command;
+        self.command_line.reset();
     }
 }

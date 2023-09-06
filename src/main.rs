@@ -1,4 +1,5 @@
 pub mod buffer;
+pub mod command_line;
 pub mod core;
 pub mod terminal;
 pub mod window;
@@ -6,6 +7,7 @@ pub mod window;
 use std::io::stdout;
 
 use crate::buffer::{mode::BufferMode, Buffer};
+use crate::command_line::CommandLine;
 use crate::core::{Point, Size};
 use crate::terminal::Terminal;
 use crate::window::Window;
@@ -30,6 +32,10 @@ fn main() {
         scroll: Point { x: 0, y: 0 },
         cursor: Point { x: 0, y: 0 },
         lines: vec![String::new()],
+        command_line: CommandLine {
+            text: String::new(),
+            cursor_x: 0,
+        },
     };
 
     window.buffers.push(buffer);

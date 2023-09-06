@@ -5,6 +5,7 @@ pub mod operations;
 pub mod paint_helper;
 pub mod text;
 
+use crate::command_line::CommandLine;
 use crate::core::{Point, Size};
 
 use self::mode::BufferMode;
@@ -15,4 +16,5 @@ pub struct Buffer {
     pub scroll: Point<usize>,
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
+    pub command_line: CommandLine,
 }

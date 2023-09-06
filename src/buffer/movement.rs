@@ -62,6 +62,7 @@ impl Buffer {
 pub mod tests {
     use crate::{
         buffer::{mode::BufferMode, Buffer},
+        command_line::CommandLine,
         core::{Point, Size},
     };
 
@@ -75,6 +76,10 @@ pub mod tests {
                 height: 5,
             },
             lines: vec![],
+            command_line: CommandLine {
+                text: String::new(),
+                cursor_x: 0,
+            },
         }
     }
 

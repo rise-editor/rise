@@ -19,7 +19,9 @@ impl CommandLine {
     }
 
     pub fn move_left(&mut self) {
-        self.cursor_x = max(0, self.cursor_x - 1);
+        if self.cursor_x > 0 {
+            self.cursor_x = max(0, self.cursor_x - 1);
+        }
     }
 
     pub fn move_right(&mut self) {
@@ -29,5 +31,47 @@ impl CommandLine {
     pub fn reset(&mut self) {
         self.text = String::new();
         self.cursor_x = 0;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::command_line::CommandLine;
+
+    #[test]
+    fn test() {
+        let mut command_line = CommandLine {
+            text: String::new(),
+            cursor_x: 0,
+        };
+
+        command_line.reset();
+
+        assert_eq!("", command_line.text);
+        assert_eq!(0, command_line.cursor_x);
+
+        command_line.delete_key();
+        command_line.move_left();
+        command_line.move_right();
+        command_line.insert_key('b');
+
+        assert_eq!("b", command_line.text);
+        assert_eq!(1, command_line.cursor_x);
+
+        command_line.move_left();
+
+        assert_eq!(0, command_line.cursor_x);
+
+        command_line.insert_key('a');
+
+        assert_eq!("ab", command_line.text);
+        assert_eq!(1, command_line.cursor_x);
+
+        command_line.move_right();
+        command_line.move_right();
+        command_line.insert_key('c');
+
+        assert_eq!("abc", command_line.text);
+        assert_eq!(3, command_line.cursor_x);
     }
 }

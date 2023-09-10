@@ -68,6 +68,7 @@ pub mod tests {
 
     fn create_buffer() -> Buffer {
         Buffer {
+            file_name: None,
             mode: BufferMode::Normal,
             scroll: Point { x: 0, y: 0 },
             cursor: Point { x: 0, y: 0 },

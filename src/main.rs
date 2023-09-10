@@ -1,5 +1,6 @@
 pub mod buffer;
 pub mod command_line;
+pub mod commands;
 pub mod core;
 pub mod terminal;
 pub mod window;
@@ -27,6 +28,7 @@ fn main() {
     };
 
     let buffer = Buffer {
+        file_name: None,
         mode: BufferMode::Normal,
         visible_area: Size { width: terminal_size.width / 4, height: terminal_size.height / 2 - 2 },
         scroll: Point { x: 0, y: 0 },

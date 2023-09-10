@@ -237,7 +237,7 @@ impl Terminal {
 
         match event.code {
             KeyCode::Char(ch) => buffer.command_line.insert_key(ch),
-            KeyCode::Enter => { },
+            KeyCode::Enter => buffer.run_command(),
 
             KeyCode::Backspace => buffer.command_line.delete_key(),
             KeyCode::Delete => buffer.command_line.delete_key(),

@@ -6,7 +6,7 @@ pub mod paint_helper;
 pub mod text;
 
 use crate::command_line::CommandLine;
-use crate::commands::write_file::WriteFileCommand;
+use crate::commands::{read_file::ReadFileCommand, write_file::WriteFileCommand};
 use crate::core::{Point, Size};
 
 use self::mode::BufferMode;
@@ -25,6 +25,8 @@ impl Buffer {
     pub fn run_command(&mut self) {
         if self.command_line.text.starts_with("w ") {
             WriteFileCommand::run(self);
+        } else if self.command_line.text.starts_with("e ") {
+            ReadFileCommand::run(self);
         }
         self.command_line.reset();
         self.enter_normal_mode();

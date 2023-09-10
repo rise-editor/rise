@@ -59,4 +59,9 @@ impl Buffer {
     pub fn get_content(&self) -> String {
         self.lines.join("\n")
     }
+
+    pub fn set_content(&mut self, content: String) {
+        self.lines = content.split('\n').map(|x| String::from(x)).collect();
+        self.move_cursor(0, 0);
+    }
 }

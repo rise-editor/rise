@@ -1,3 +1,7 @@
+pub mod command_mode;
+pub mod insert_mode;
+pub mod normal_mode;
+
 use std::{
     fs::File,
     io::{Stdout, Write},
@@ -13,7 +17,14 @@ use crossterm::{
     terminal::{Clear, ClearType},
 };
 
-use crate::{buffer::mode::BufferMode, core::Size, window::Window};
+use crate::{
+    buffer::mode::BufferMode, core::Size, window::Window,
+    terminal::{
+        command_mode::handle_key_press_command,
+        insert_mode::handle_key_press_insert,
+        normal_mode::handle_key_press_normal,
+    }
+};
 
 pub struct Terminal {
     pub stdout: Stdout,
@@ -154,102 +165,6 @@ impl Terminal {
         self.set_cursor_blinking_bar();
     }
 
-    pub fn handle_key_press_normal(&mut self, event: KeyEvent) {
-        let buffer = self.window.get_active_buffer_mut();
-
-        match event.code {
-            KeyCode::Esc => self.stop_requested = true,
-
-            KeyCode::Left => buffer.move_left(),
-            KeyCode::Right => buffer.move_right(),
-            KeyCode::Up => buffer.move_up(),
-            KeyCode::Down => buffer.move_down(),
-
-            KeyCode::Char('w') => buffer.move_to_next_word_start(),
-
-            KeyCode::Char('h') => buffer.move_left(),
-            KeyCode::Char('j') => buffer.move_down(),
-            KeyCode::Char('k') => buffer.move_up(),
-            KeyCode::Char('l') => buffer.move_right(),
-
-            KeyCode::Char('g') => buffer.move_first_row(),
-            KeyCode::Char('G') => buffer.move_last_row(),
-            KeyCode::Char('0') => buffer.move_first_column(),
-            KeyCode::Char('$') => buffer.move_last_column(),
-                 
-            KeyCode::Char('a') => self.enter_insert_mode_after(),
-            KeyCode::Char('A') => {
-                buffer.move_last_column();
-                self.enter_insert_mode_after();
-            },
-            KeyCode::Char('s') => {
-                self.enter_insert_mode();
-                let b = self.window.get_active_buffer_mut();
-                b.delete_char_before(b.cursor.y, b.cursor.y);
-            },
-            KeyCode::Char('i') => {
-                buffer.enter_insert_mode();
-                self.set_cursor_blinking_bar();
-            },
-            KeyCode::Char('o') => {
-                buffer.insert_newline(buffer.cursor.y + 1);
-                self.enter_insert_mode();
-            }
-            KeyCode::Char('O') => {
-                buffer.insert_newline(buffer.cursor.y);
-                self.enter_insert_mode();
-            },
-
-            KeyCode::Char('x') => buffer.delete_char(),
-
-            KeyCode::Char(':') => buffer.enter_command_mode(),
-
-            _ => {}
-        };
-    }
-
-    pub fn handle_key_press_insert(&mut self, event: KeyEvent) {
-        let buffer = self.window.get_active_buffer_mut();
-
-        match event.code {
-            KeyCode::Char(ch) => buffer.insert_char(ch),
-            KeyCode::Tab => {
-                buffer.insert_char(' ');
-                buffer.insert_char(' ');
-            }
-            KeyCode::Enter => buffer.split_line(buffer.cursor.y, buffer.cursor.x),
-
-            KeyCode::Backspace => buffer.delete_char_before(buffer.cursor.y, buffer.cursor.x),
-            KeyCode::Delete => buffer.delete_char(),
-
-            KeyCode::Left => buffer.move_left(),
-            KeyCode::Right => buffer.move_right(),
-            KeyCode::Up => buffer.move_up(),
-            KeyCode::Down => buffer.move_down(),
-
-            KeyCode::Esc => self.enter_normal_mode(),
-            _ => todo!(),
-        };
-    }
-
-    pub fn handle_key_press_command(&mut self, event: KeyEvent) {
-        let buffer = self.window.get_active_buffer_mut();
-
-        match event.code {
-            KeyCode::Char(ch) => buffer.command_line.insert_key(ch),
-            KeyCode::Enter => buffer.run_command(),
-
-            KeyCode::Backspace => buffer.command_line.delete_key(),
-            KeyCode::Delete => buffer.command_line.delete_key(),
-
-            KeyCode::Left => buffer.command_line.move_left(),
-            KeyCode::Right => buffer.command_line.move_right(),
-
-            KeyCode::Esc => self.enter_normal_mode(),
-            _ => todo!(),
-        };
-    }
-
     pub fn handle_key_press(&mut self, event: KeyEvent) {
         let save_key_event = KeyEvent {
             modifiers: KeyModifiers::CONTROL,
@@ -265,9 +180,9 @@ impl Terminal {
         }
 
         match self.window.get_active_buffer().mode {
-            BufferMode::Normal => self.handle_key_press_normal(event),
-            BufferMode::Insert => self.handle_key_press_insert(event),
-            BufferMode::Command => self.handle_key_press_command(event),
+            BufferMode::Normal => handle_key_press_normal(self, event),
+            BufferMode::Insert => handle_key_press_insert(self, event),
+            BufferMode::Command => handle_key_press_command(self, event),
             _ => todo!(),
         }
 

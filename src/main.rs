@@ -1,5 +1,4 @@
 pub mod buffer;
-pub mod command_line;
 pub mod commands;
 pub mod core;
 pub mod terminal;
@@ -7,8 +6,7 @@ pub mod window;
 
 use std::io::stdout;
 
-use crate::buffer::{mode::BufferMode, Buffer, Select};
-use crate::command_line::CommandLine;
+use crate::buffer::Buffer;
 use crate::core::{Point, Size};
 use crate::terminal::Terminal;
 use crate::window::Window;
@@ -27,19 +25,10 @@ fn main() {
         buffers: vec![],
     };
 
-    let buffer = Buffer {
-        file_name: None,
-        mode: BufferMode::Normal,
-        visible_area: Size { width: terminal_size.width / 4, height: terminal_size.height / 2 - 2 },
-        scroll: Point { x: 0, y: 0 },
-        cursor: Point { x: 0, y: 0 },
-        lines: vec![String::new()],
-        select: Select { start: Point { x: 0, y: 0 } },
-        command_line: CommandLine {
-            text: String::new(),
-            cursor_x: 0,
-        },
-    };
+    let buffer = Buffer::new(Size {
+        width: terminal_size.width / 4,
+        height: terminal_size.height / 2 - 2,
+    });
 
     window.buffers.push(buffer);
 

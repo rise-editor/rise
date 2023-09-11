@@ -12,13 +12,7 @@ pub fn handle_key_press_visual(terminal: &mut Terminal, event: KeyEvent) {
         KeyCode::Char('k') => buffer.move_up(),
         KeyCode::Char('l') => buffer.move_right(),
 
-        KeyCode::Char('o') => {
-            let x = buffer.cursor.x;
-            let y = buffer.cursor.y;
-            buffer.move_cursor(buffer.select.start.y, buffer.select.start.x);
-            buffer.select.start.x = x;
-            buffer.select.start.y = y;
-        },
+        KeyCode::Char('o') => buffer.reverse_selection(),
 
         _ => todo!(),
     };

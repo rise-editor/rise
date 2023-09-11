@@ -1,4 +1,4 @@
-use super::Buffer;
+use crate::buffer::Buffer;
 
 impl Buffer {
     pub fn column_to_visible_x(&self, column: usize) -> u16 {

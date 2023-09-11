@@ -7,8 +7,8 @@ pub struct WriteFileCommand {}
 
 impl WriteFileCommand {
     pub fn run(buffer: &mut Buffer) {
-        if buffer.command_line.text.len() > 2 {
-            let file_name = &buffer.command_line.text[2..];
+        if buffer.command.text.len() > 2 {
+            let file_name = &buffer.command.text[2..];
             if file_name.starts_with("~/") {
                 let mut file_path = home::home_dir().unwrap();
                 file_path.push(&file_name[2..]);

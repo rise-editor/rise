@@ -63,7 +63,7 @@ impl Terminal {
         let y;
 
         if buffer.mode == BufferMode::Command {
-            x = self.window.position.x + buffer.command_line.cursor_x as u16 + 1; // TODO: Make command line scrollable
+            x = self.window.position.x + buffer.command.cursor_x as u16 + 1; // TODO: Make command line scrollable
             y = self.window.get_active_buffer_visible_y(buffer.visible_area.height as usize - 2);
         } else {
             x = self.window.get_active_buffer_visible_x(buffer.cursor.x) + 4;
@@ -79,7 +79,7 @@ impl Terminal {
                 self.window.position.y + self.window.size.height - 2,
                 self.window.position.x,
             );
-            print!(":{}", self.window.get_active_buffer().command_line.text);
+            print!(":{}", self.window.get_active_buffer().command.text);
         }
     }
 
@@ -163,11 +163,6 @@ impl Terminal {
 
     pub fn enter_insert_mode(&mut self) {
         self.window.get_active_buffer_mut().enter_insert_mode();
-        self.set_cursor_blinking_bar();
-    }
-
-    pub fn enter_insert_mode_after(&mut self) {
-        self.window.get_active_buffer_mut().enter_insert_mode_after();
         self.set_cursor_blinking_bar();
     }
 

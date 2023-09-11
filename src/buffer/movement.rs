@@ -20,7 +20,6 @@ impl Buffer {
         }
     }
 
-
     pub fn move_left(&mut self) {
         if self.cursor.x > 0 {
             self.move_cursor(self.cursor.y, self.cursor.x - 1);
@@ -60,34 +59,19 @@ impl Buffer {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{
-        buffer::{mode::BufferMode, Buffer, Select},
-        command_line::CommandLine,
-        core::{Point, Size},
-    };
+    use crate::{buffer::Buffer, core::Size};
 
     fn create_buffer() -> Buffer {
-        Buffer {
-            file_name: None,
-            mode: BufferMode::Normal,
-            scroll: Point { x: 0, y: 0 },
-            cursor: Point { x: 0, y: 0 },
-            visible_area: Size {
-                width: 5,
-                height: 5,
-            },
-            lines: vec![],
-            select: Select { start: Point { x: 0, y: 0 } },
-            command_line: CommandLine {
-                text: String::new(),
-                cursor_x: 0,
-            },
-        }
+        Buffer::new(Size {
+            width: 5,
+            height: 5,
+        })
     }
 
     #[test]
     pub fn move_tests() {
         let mut buffer = create_buffer();
+        buffer.lines.remove(0);
         buffer.lines.push(String::from("1234567890"));
         buffer.lines.push(String::from("abcde"));
         buffer.lines.push(String::new());
@@ -138,7 +122,6 @@ pub mod tests {
     #[test]
     pub fn move_last_column_test() {
         let mut buffer = create_buffer();
-        buffer.lines.push(String::new());
         buffer.enter_insert_mode();
         buffer.insert_char('1');
         buffer.insert_char('2');

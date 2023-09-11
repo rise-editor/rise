@@ -24,7 +24,11 @@ impl Buffer {
     }
 
     fn find_next_word_start(&self) -> Point<usize> {
-        let current_char = self.get_line(self.cursor.y).chars().nth(self.cursor.x).unwrap();
+        let current_char = self
+            .get_line(self.cursor.y)
+            .chars()
+            .nth(self.cursor.x)
+            .unwrap();
         let mut current_char_type: CharType = get_char_type(current_char);
         let mut column_start_index = self.cursor.x + 1;
 
@@ -54,34 +58,15 @@ impl Buffer {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        buffer::{mode::BufferMode, Buffer, Select},
-        command_line::CommandLine,
-        core::{Point, Size},
-    };
-
-    fn create_buffer() -> Buffer {
-        Buffer {
-            file_name: None,
-            mode: BufferMode::Normal,
-            scroll: Point { x: 0, y: 0 },
-            cursor: Point { x: 0, y: 0 },
-            visible_area: Size {
-                width: 5,
-                height: 5,
-            },
-            lines: vec![],
-            select: Select { start: Point { x: 0, y: 0 } },
-            command_line: CommandLine {
-                text: String::new(),
-                cursor_x: 0,
-            },
-        }
-    }
+    use crate::{buffer::Buffer, core::Size};
 
     #[test]
     fn find_next_word_start_test() {
-        let mut buffer = create_buffer();
+        let mut buffer = Buffer::new(Size {
+            width: 5,
+            height: 5,
+        });
+        buffer.lines.remove(0);
         buffer.lines.push(String::from("abc defg"));
         buffer.lines.push(String::from("123 123"));
         buffer.move_cursor(1, 2);

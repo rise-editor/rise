@@ -24,10 +24,14 @@ pub fn handle_key_press_normal(terminal: &mut Terminal, event: KeyEvent) {
         KeyCode::Char('0') => buffer.move_first_column(),
         KeyCode::Char('$') => buffer.move_last_column(),
 
-        KeyCode::Char('a') => terminal.enter_insert_mode_after(),
+        KeyCode::Char('a') => {
+            terminal.enter_insert_mode();
+            terminal.window.get_active_buffer_mut().move_right();
+        },
         KeyCode::Char('A') => {
             buffer.move_last_column();
-            terminal.enter_insert_mode_after();
+            terminal.enter_insert_mode();
+            terminal.window.get_active_buffer_mut().move_right();
         }
         KeyCode::Char('s') => {
             terminal.enter_insert_mode();

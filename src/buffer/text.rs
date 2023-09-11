@@ -22,7 +22,7 @@ impl Buffer {
         }
         let end_index = min(
             line.len(),
-            self.scroll.x + (self.visible_area.width as usize),
+            self.scroll.x + (self.area.width as usize),
         );
 
         line[start_index..end_index].to_string()

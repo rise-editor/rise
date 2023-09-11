@@ -9,14 +9,14 @@ impl Buffer {
 
         if self.cursor.x < self.scroll.x {
             self.scroll.x = self.cursor.x
-        } else if self.scroll.x + (self.visible_area.width as usize) <= self.cursor.x {
-            self.scroll.x = self.cursor.x - (self.visible_area.width as usize) + 1;
+        } else if self.scroll.x + (self.area.width as usize) <= self.cursor.x {
+            self.scroll.x = self.cursor.x - (self.area.width as usize) + 1;
         }
 
         if self.cursor.y < self.scroll.y {
             self.scroll.y = self.cursor.y;
-        } else if self.scroll.y + (self.visible_area.height as usize) <= self.cursor.y {
-            self.scroll.y = self.cursor.y - (self.visible_area.height as usize) + 1;
+        } else if self.scroll.y + (self.area.height as usize) <= self.cursor.y {
+            self.scroll.y = self.cursor.y - (self.area.height as usize) + 1;
         }
     }
 

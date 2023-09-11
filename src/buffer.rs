@@ -13,7 +13,7 @@ use crate::core::{editable::Editable, Point, Size};
 pub struct Buffer {
     pub file_name: Option<String>,
     pub mode: BufferMode,
-    pub visible_area: Size<u16>,
+    pub area: Size<u16>,
     pub scroll: Point<usize>,
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
@@ -26,7 +26,7 @@ impl Buffer {
         Buffer {
             file_name: None,
             mode: BufferMode::Normal,
-            visible_area: area,
+            area,
             scroll: Point { x: 0, y: 0 },
             cursor: Point { x: 0, y: 0 },
             lines: vec![String::new()],

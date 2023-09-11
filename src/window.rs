@@ -23,8 +23,8 @@ impl Window {
         self.size.height = height;
 
         for buffer in self.buffers.iter_mut() {
-            buffer.visible_area.width = width;
-            buffer.visible_area.height = height;
+            buffer.area.width = width;
+            buffer.area.height = height;
         }
     }
 

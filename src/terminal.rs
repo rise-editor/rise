@@ -64,7 +64,7 @@ impl Terminal {
 
         if buffer.mode == BufferMode::Command {
             x = self.window.position.x + buffer.command.cursor_x as u16 + 1; // TODO: Make command line scrollable
-            y = self.window.get_active_buffer_visible_y(buffer.visible_area.height as usize - 2);
+            y = self.window.get_active_buffer_visible_y(buffer.area.height as usize - 2);
         } else {
             x = self.window.get_active_buffer_visible_x(buffer.cursor.x) + 4;
             y = self.window.get_active_buffer_visible_y(buffer.cursor.y);
@@ -94,8 +94,8 @@ impl Terminal {
             active_buffer.mode,
             active_buffer.cursor.x + 1,
             active_buffer.cursor.y + 1,
-            active_buffer.visible_area.width,
-            active_buffer.visible_area.height
+            active_buffer.area.width,
+            active_buffer.area.height
         );
         self.stdout.flush().unwrap();
     }
@@ -105,7 +105,7 @@ impl Terminal {
         let line_count = buffer.get_row_count();
 
         self.clear_all();
-        for line_index in buffer.scroll.y..(buffer.scroll.y + buffer.visible_area.height as usize) {
+        for line_index in buffer.scroll.y..(buffer.scroll.y + buffer.area.height as usize) {
             let x = self.window.get_active_buffer_visible_x(buffer.scroll.x);
             let y = self.window.get_active_buffer_visible_y(line_index);
             self.move_to(y, x);

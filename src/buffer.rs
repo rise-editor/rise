@@ -11,6 +11,10 @@ use crate::core::{Point, Size};
 
 use self::mode::BufferMode;
 
+pub struct Select {
+    pub start: Point<usize>,
+}
+
 pub struct Buffer {
     pub file_name: Option<String>,
     pub mode: BufferMode,
@@ -18,6 +22,7 @@ pub struct Buffer {
     pub scroll: Point<usize>,
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
+    pub select: Select,
     pub command_line: CommandLine,
 }
 

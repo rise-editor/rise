@@ -1,6 +1,7 @@
 pub mod command_mode;
 pub mod insert_mode;
 pub mod normal_mode;
+pub mod visual_mode;
 
 use std::{
     fs::File,
@@ -23,6 +24,7 @@ use crate::{
         command_mode::handle_key_press_command,
         insert_mode::handle_key_press_insert,
         normal_mode::handle_key_press_normal,
+        visual_mode::handle_key_press_visual,
     }
 };
 
@@ -155,6 +157,10 @@ impl Terminal {
         self.set_cursor_blinking_block();
     }
 
+    pub fn enter_visual_mode(&mut self) {
+        self.window.get_active_buffer_mut().enter_visual_mode();
+    }
+
     pub fn enter_insert_mode(&mut self) {
         self.window.get_active_buffer_mut().enter_insert_mode();
         self.set_cursor_blinking_bar();
@@ -183,7 +189,7 @@ impl Terminal {
             BufferMode::Normal => handle_key_press_normal(self, event),
             BufferMode::Insert => handle_key_press_insert(self, event),
             BufferMode::Command => handle_key_press_command(self, event),
-            _ => todo!(),
+            BufferMode::Visual => handle_key_press_visual(self, event),
         }
 
         self.redraw_all();

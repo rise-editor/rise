@@ -49,6 +49,8 @@ pub fn handle_key_press_normal(terminal: &mut Terminal, event: KeyEvent) {
 
         KeyCode::Char('x') => buffer.delete_char(),
 
+        KeyCode::Char('v') => terminal.enter_visual_mode(),
+
         KeyCode::Char(':') => buffer.enter_command_mode(),
 
         _ => {}

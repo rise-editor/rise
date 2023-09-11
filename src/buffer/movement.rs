@@ -61,7 +61,7 @@ impl Buffer {
 #[cfg(test)]
 pub mod tests {
     use crate::{
-        buffer::{mode::BufferMode, Buffer},
+        buffer::{mode::BufferMode, Buffer, Select},
         command_line::CommandLine,
         core::{Point, Size},
     };
@@ -77,6 +77,7 @@ pub mod tests {
                 height: 5,
             },
             lines: vec![],
+            select: Select { start: Point { x: 0, y: 0 } },
             command_line: CommandLine {
                 text: String::new(),
                 cursor_x: 0,

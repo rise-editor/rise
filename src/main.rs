@@ -7,7 +7,7 @@ pub mod window;
 
 use std::io::stdout;
 
-use crate::buffer::{mode::BufferMode, Buffer};
+use crate::buffer::{mode::BufferMode, Buffer, Select};
 use crate::command_line::CommandLine;
 use crate::core::{Point, Size};
 use crate::terminal::Terminal;
@@ -34,6 +34,7 @@ fn main() {
         scroll: Point { x: 0, y: 0 },
         cursor: Point { x: 0, y: 0 },
         lines: vec![String::new()],
+        select: Select { start: Point { x: 0, y: 0 } },
         command_line: CommandLine {
             text: String::new(),
             cursor_x: 0,

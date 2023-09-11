@@ -36,6 +36,12 @@ impl Buffer {
         self.move_right();
     }
 
+    pub fn enter_visual_mode(&mut self) {
+        self.mode = BufferMode::Visual;
+        self.select.start.x = self.cursor.x;
+        self.select.start.y = self.cursor.y;
+    }
+
     pub fn enter_command_mode(&mut self) {
         self.mode = BufferMode::Command;
         self.command_line.reset();

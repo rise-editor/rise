@@ -1,16 +1,8 @@
-pub mod command_mode;
-pub mod insert_mode;
-pub mod normal_mode;
-pub mod visual_mode;
-
-use std::{
-    fs::File,
-    io::{Stdout, Write},
-};
+use std::io::{Stdout, Write};
 
 use crossterm::{
     cursor::{MoveTo, SetCursorStyle},
-    event::{read, Event, KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers},
+    event::{read, Event, KeyCode, KeyEvent, KeyModifiers},
     execute,
     terminal::{
         disable_raw_mode, enable_raw_mode, size, EnterAlternateScreen, LeaveAlternateScreen,
@@ -19,13 +11,9 @@ use crossterm::{
 };
 
 use crate::{
-    buffer::mode::BufferMode, core::Size, window::Window,
-    terminal::{
-        command_mode::handle_key_press_command,
-        insert_mode::handle_key_press_insert,
-        normal_mode::handle_key_press_normal,
-        visual_mode::handle_key_press_visual,
-    }
+    buffer::mode::BufferMode,
+    core::{key::Key, Size},
+    window::Window,
 };
 
 pub struct Terminal {
@@ -64,7 +52,9 @@ impl Terminal {
 
         if buffer.mode == BufferMode::Command {
             x = self.window.position.x + buffer.command.cursor_x as u16 + 1; // TODO: Make command line scrollable
-            y = self.window.get_active_buffer_visible_y(buffer.area.height as usize - 2);
+            y = self
+                .window
+                .get_active_buffer_visible_y(buffer.area.height as usize - 2);
         } else {
             x = self.window.get_active_buffer_visible_x(buffer.cursor.x) + 4;
             y = self.window.get_active_buffer_visible_y(buffer.cursor.y);
@@ -112,7 +102,7 @@ impl Terminal {
 
             if line_index < line_count {
                 let line = buffer.get_line_visible_text(line_index);
-                println!("{:>3} {}", line_index + 1, line);
+                println!("{:>3}|{}", line_index + 1, line);
             } else {
                 println!("~");
             }
@@ -167,26 +157,33 @@ impl Terminal {
     }
 
     pub fn handle_key_press(&mut self, event: KeyEvent) {
-        let save_key_event = KeyEvent {
-            modifiers: KeyModifiers::CONTROL,
-            code: KeyCode::Char('s'),
-            kind: KeyEventKind::Press,
-            state: KeyEventState::NONE,
+        let code = match event.code {
+            KeyCode::Char(c) => c.to_string(),
+            KeyCode::Esc => String::from("esc"),
+            KeyCode::Tab => String::from("tab"),
+            KeyCode::Enter => String::from("enter"),
+            KeyCode::Backspace => String::from("backspace"),
+            KeyCode::Delete => String::from("delete"),
+            KeyCode::Up => String::from("up"),
+            KeyCode::Down => String::from("down"),
+            KeyCode::Left => String::from("left"),
+            KeyCode::Right => String::from("right"),
+            _ => todo!(),
         };
 
-        if event == save_key_event {
-            let mut file = File::create("/tmp/editorise.txt").unwrap();
-            file.write_all(self.window.get_active_buffer().get_content().as_bytes()).unwrap();
+        if code == "esc" && self.window.get_active_buffer().mode == BufferMode::Normal {
+            self.stop_requested = true;
             return;
         }
 
-        match self.window.get_active_buffer().mode {
-            BufferMode::Normal => handle_key_press_normal(self, event),
-            BufferMode::Insert => handle_key_press_insert(self, event),
-            BufferMode::Command => handle_key_press_command(self, event),
-            BufferMode::Visual => handle_key_press_visual(self, event),
-        }
+        let key = Key {
+            ctrl: event.modifiers.contains(KeyModifiers::CONTROL),
+            win: event.modifiers.contains(KeyModifiers::META),
+            alt: event.modifiers.contains(KeyModifiers::ALT),
+            code,
+        };
 
+        self.window.get_active_buffer_mut().handle_key(key);
         self.redraw_all();
     }
 }

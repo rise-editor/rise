@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::buffer::Buffer;
+use crate::buffer::{actions::find_next_word_position::find_next_word_position, Buffer};
 
 pub fn get_default_insert_maps() -> HashMap<&'static str, fn(&mut Buffer)> {
     let mut map: HashMap<&str, fn(&mut Buffer)> = HashMap::new();
@@ -36,7 +36,10 @@ pub fn get_default_normal_maps() -> HashMap<&'static str, fn(&mut Buffer)> {
     map.insert("0", |buffer| buffer.move_first_column());
     map.insert("$", |buffer| buffer.move_last_column());
 
-    map.insert("w", |buffer| buffer.move_to_next_word_start());
+    map.insert("w", |buffer| {
+        let new_position = find_next_word_position(buffer);
+        buffer.move_cursor(new_position.y, new_position.x);
+    });
 
     map.insert("x", |buffer| buffer.delete_char());
 

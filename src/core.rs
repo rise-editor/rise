@@ -1,4 +1,4 @@
-pub mod editable;
+pub mod editable_text;
 pub mod key;
 
 pub struct Point<T> {

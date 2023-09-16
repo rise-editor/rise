@@ -1,17 +1,17 @@
 use std::cmp::min;
 
-pub struct Editable {
+pub struct EditableText {
     pub text: String,
     pub cursor_x: usize,
 }
 
-impl Editable {
-    pub fn insert_key(&mut self, ch: char) {
+impl EditableText {
+    pub fn insert_char(&mut self, ch: char) {
         self.text.insert(self.cursor_x, ch);
         self.move_right();
     }
 
-    pub fn delete_key(&mut self) {
+    pub fn delete_char(&mut self) {
         if self.cursor_x > 0 {
             self.text.remove(self.cursor_x - 1);
             self.move_left();
@@ -36,11 +36,11 @@ impl Editable {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::editable::Editable;
+    use crate::core::editable_text::EditableText;
 
     #[test]
     fn test() {
-        let mut editable = Editable {
+        let mut editable = EditableText {
             text: String::new(),
             cursor_x: 0,
         };
@@ -50,10 +50,10 @@ mod tests {
         assert_eq!("", editable.text);
         assert_eq!(0, editable.cursor_x);
 
-        editable.delete_key();
+        editable.delete_char();
         editable.move_left();
         editable.move_right();
-        editable.insert_key('b');
+        editable.insert_char('b');
 
         assert_eq!("b", editable.text);
         assert_eq!(1, editable.cursor_x);
@@ -62,14 +62,14 @@ mod tests {
 
         assert_eq!(0, editable.cursor_x);
 
-        editable.insert_key('a');
+        editable.insert_char('a');
 
         assert_eq!("ab", editable.text);
         assert_eq!(1, editable.cursor_x);
 
         editable.move_right();
         editable.move_right();
-        editable.insert_key('c');
+        editable.insert_char('c');
 
         assert_eq!("abc", editable.text);
         assert_eq!(3, editable.cursor_x);

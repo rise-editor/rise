@@ -13,15 +13,13 @@ use std::collections::HashMap;
 
 use crate::buffer::{
     maps::{
-        get_default_command_maps,
-        get_default_insert_maps,
-        get_default_normal_maps,
+        get_default_command_maps, get_default_insert_maps, get_default_normal_maps,
         get_default_visual_maps,
     },
     mode::BufferMode,
     select::Select,
 };
-use crate::core::{editable::Editable, Point, Size};
+use crate::core::{editable_text::EditableText, Point, Size};
 
 pub struct Buffer {
     pub file_name: Option<String>,
@@ -31,7 +29,7 @@ pub struct Buffer {
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
     pub select: Select,
-    pub command: Editable,
+    pub command: EditableText,
     pub actions_command: HashMap<&'static str, fn(&mut Buffer)>,
     pub actions_insert: HashMap<&'static str, fn(&mut Buffer)>,
     pub actions_normal: HashMap<&'static str, fn(&mut Buffer)>,
@@ -50,7 +48,7 @@ impl Buffer {
             select: Select {
                 start: Point { x: 0, y: 0 },
             },
-            command: Editable {
+            command: EditableText {
                 text: String::new(),
                 cursor_x: 0,
             },

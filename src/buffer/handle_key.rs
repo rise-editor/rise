@@ -34,7 +34,7 @@ impl Buffer {
                     None => {
                         if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                             let ch = key.code.chars().nth(0).unwrap();
-                            self.command.insert_key(ch);
+                            self.command.insert_char(ch);
                         }
                     }
                 }

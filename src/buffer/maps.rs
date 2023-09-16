@@ -71,7 +71,7 @@ pub fn get_default_command_maps() -> HashMap<&'static str, fn(&mut Buffer)> {
     let mut map: HashMap<&str, fn(&mut Buffer)> = HashMap::new();
     map.insert("esc", |buffer| buffer.enter_normal_mode());
     map.insert("enter", |buffer| buffer.run_command());
-    map.insert("backspace", |buffer| buffer.command.delete_key());
+    map.insert("backspace", |buffer| buffer.command.delete_char());
     map.insert("left", |buffer| buffer.command.move_left());
     map.insert("right", |buffer| buffer.command.move_right());
     return map;

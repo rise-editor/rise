@@ -6,8 +6,6 @@ pub mod window;
 
 use std::io::stdout;
 
-use crate::buffer::Buffer;
-use crate::core::{Point, Size};
 use crate::terminal::Terminal;
 use crate::window::Window;
 
@@ -16,21 +14,8 @@ fn main() {
 
     let terminal_size = Terminal::get_terminal_size();
 
-    let mut window = Window {
-        position: Point { x: 5, y: 5 },
-        size: Size {
-            width: terminal_size.width / 4,
-            height: terminal_size.height / 2 - 2,
-        },
-        buffers: vec![],
-    };
-
-    let buffer = Buffer::new(Size {
-        width: terminal_size.width / 4,
-        height: terminal_size.height / 2 - 2,
-    });
-
-    window.buffers.push(buffer);
+    let mut window = Window::new(terminal_size);
+    window.create_new_buffer();
 
     let mut terminal = Terminal {
         stdout,

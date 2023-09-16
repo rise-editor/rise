@@ -1,14 +1,6 @@
 use std::io::{Stdout, Write};
 
-use crossterm::{
-    cursor::{MoveTo, SetCursorStyle},
-    event::{read, Event, KeyCode, KeyEvent, KeyModifiers},
-    execute,
-    terminal::{
-        disable_raw_mode, enable_raw_mode, size, EnterAlternateScreen, LeaveAlternateScreen,
-    },
-    terminal::{Clear, ClearType},
-};
+use crossterm::{cursor, event, execute, terminal};
 
 use crate::{
     buffer::mode::BufferMode,
@@ -24,24 +16,24 @@ pub struct Terminal {
 
 impl Terminal {
     pub fn start(&mut self) {
-        enable_raw_mode().unwrap();
-        execute!(self.stdout, EnterAlternateScreen).unwrap();
+        terminal::enable_raw_mode().unwrap();
+        execute!(self.stdout, terminal::EnterAlternateScreen).unwrap();
         self.redraw_all();
         self.stop_requested = false;
     }
 
     pub fn end(&mut self) {
-        disable_raw_mode().unwrap();
-        execute!(self.stdout, LeaveAlternateScreen).unwrap();
+        terminal::disable_raw_mode().unwrap();
+        execute!(self.stdout, terminal::LeaveAlternateScreen).unwrap();
         self.stop_requested = true;
     }
 
     pub fn clear_all(&self) {
-        execute!(&self.stdout, Clear(ClearType::All)).unwrap();
+        execute!(&self.stdout, terminal::Clear(terminal::ClearType::All)).unwrap();
     }
 
     pub fn move_to(&self, row: u16, column: u16) {
-        execute!(&self.stdout, MoveTo(column, row)).unwrap();
+        execute!(&self.stdout, cursor::MoveTo(column, row)).unwrap();
     }
 
     pub fn move_to_cursor(&self) {
@@ -52,9 +44,7 @@ impl Terminal {
 
         if buffer.mode == BufferMode::Command {
             x = self.window.position.x + buffer.command.cursor_x as u16 + 1; // TODO: Make command line scrollable
-            y = self
-                .window
-                .get_active_buffer_visible_y(buffer.area.height as usize - 2);
+            y = self.window.position.y + self.window.size.height - 2;
         } else {
             x = self.window.get_active_buffer_visible_x(buffer.cursor.x) + 4;
             y = self.window.get_active_buffer_visible_y(buffer.cursor.y);
@@ -113,27 +103,27 @@ impl Terminal {
     }
 
     pub fn set_cursor_blinking_block(&mut self) {
-        execute!(self.stdout, SetCursorStyle::BlinkingBlock).unwrap();
+        execute!(self.stdout, cursor::SetCursorStyle::BlinkingBlock).unwrap();
     }
 
     pub fn set_cursor_blinking_bar(&mut self) {
-        execute!(self.stdout, SetCursorStyle::BlinkingBar).unwrap();
+        execute!(self.stdout, cursor::SetCursorStyle::BlinkingBar).unwrap();
     }
 
     pub fn get_terminal_size() -> Size<u16> {
-        let (columns, rows) = size().unwrap();
+        let (columns, rows) = terminal::size().unwrap();
         Size {
             width: columns,
             height: rows,
         }
     }
 
-    pub fn read(&mut self) -> Option<KeyEvent> {
-        let event = read().unwrap();
+    pub fn read(&mut self) -> Option<event::KeyEvent> {
+        let event = event::read().unwrap();
 
         match event {
-            Event::Key(key_event) => Some(key_event),
-            Event::Resize(columns, rows) => {
+            event::Event::Key(key_event) => Some(key_event),
+            event::Event::Resize(columns, rows) => {
                 self.window.set_size(columns, rows - 2);
                 self.redraw_all();
                 None
@@ -156,18 +146,18 @@ impl Terminal {
         self.set_cursor_blinking_bar();
     }
 
-    pub fn handle_key_press(&mut self, event: KeyEvent) {
+    pub fn handle_key_press(&mut self, event: event::KeyEvent) {
         let code = match event.code {
-            KeyCode::Char(c) => c.to_string(),
-            KeyCode::Esc => String::from("esc"),
-            KeyCode::Tab => String::from("tab"),
-            KeyCode::Enter => String::from("enter"),
-            KeyCode::Backspace => String::from("backspace"),
-            KeyCode::Delete => String::from("delete"),
-            KeyCode::Up => String::from("up"),
-            KeyCode::Down => String::from("down"),
-            KeyCode::Left => String::from("left"),
-            KeyCode::Right => String::from("right"),
+            event::KeyCode::Char(c) => c.to_string(),
+            event::KeyCode::Esc => String::from("esc"),
+            event::KeyCode::Tab => String::from("tab"),
+            event::KeyCode::Enter => String::from("enter"),
+            event::KeyCode::Backspace => String::from("backspace"),
+            event::KeyCode::Delete => String::from("delete"),
+            event::KeyCode::Up => String::from("up"),
+            event::KeyCode::Down => String::from("down"),
+            event::KeyCode::Left => String::from("left"),
+            event::KeyCode::Right => String::from("right"),
             _ => todo!(),
         };
 
@@ -177,9 +167,9 @@ impl Terminal {
         }
 
         let key = Key {
-            ctrl: event.modifiers.contains(KeyModifiers::CONTROL),
-            win: event.modifiers.contains(KeyModifiers::META),
-            alt: event.modifiers.contains(KeyModifiers::ALT),
+            ctrl: event.modifiers.contains(event::KeyModifiers::CONTROL),
+            win: event.modifiers.contains(event::KeyModifiers::META),
+            alt: event.modifiers.contains(event::KeyModifiers::ALT),
             code,
         };
 

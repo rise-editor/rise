@@ -10,6 +10,23 @@ pub struct Window {
 }
 
 impl Window {
+    pub fn new(size: Size<u16>) -> Self {
+        Self {
+            position: Point { x: 0, y: 0 },
+            size,
+            buffers: vec![],
+        }
+    }
+
+    pub fn create_new_buffer(&mut self) {
+        let buffer = Buffer::new(Size {
+            width: self.size.width,
+            height: self.size.height - 2,
+        });
+
+        self.buffers.push(buffer);
+    }
+
     pub fn get_active_buffer(&self) -> &Buffer {
         self.buffers.get(0).unwrap()
     }
@@ -33,6 +50,6 @@ impl Window {
     }
 
     pub fn get_active_buffer_visible_y(&self, row: usize) -> u16 {
-        self.position.y + self.get_active_buffer().row_to_visible_y(row)
+        self.position.y + 1 + self.get_active_buffer().row_to_visible_y(row)
     }
 }

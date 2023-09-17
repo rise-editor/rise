@@ -4,15 +4,15 @@ pub mod core;
 pub mod terminal;
 pub mod window;
 
-use std::io::stdout;
+use std::io::{stdout, Result};
 
 use crate::terminal::Terminal;
 use crate::window::Window;
 
-fn main() {
+fn main() -> Result<()> {
     let stdout = stdout();
 
-    let terminal_size = Terminal::get_terminal_size();
+    let terminal_size = Terminal::get_terminal_size()?;
 
     let mut window = Window::new(terminal_size);
     window.create_new_buffer();
@@ -32,4 +32,6 @@ fn main() {
     }
 
     terminal.end();
+
+    Ok(())
 }

@@ -1,4 +1,4 @@
-use std::io::{Stdout, Write};
+use std::io::{Result, Stdout, Write};
 
 use crossterm::{cursor, event, execute, terminal};
 
@@ -81,6 +81,13 @@ impl Terminal {
     }
 
     pub fn redraw_all(&mut self) {
+        match self.window.get_active_buffer().mode {
+            BufferMode::Normal => self.set_cursor_blinking_block(),
+            BufferMode::Visual => self.set_cursor_blinking_block(),
+            BufferMode::Command => self.set_cursor_blinking_bar(),
+            BufferMode::Insert => self.set_cursor_blinking_bar(),
+        }
+
         let buffer = self.window.get_active_buffer();
         let line_count = buffer.get_row_count();
 
@@ -110,15 +117,17 @@ impl Terminal {
         execute!(self.stdout, cursor::SetCursorStyle::BlinkingBar).unwrap();
     }
 
-    pub fn get_terminal_size() -> Size<u16> {
-        let (columns, rows) = terminal::size().unwrap();
-        Size {
+    pub fn get_terminal_size() -> Result<Size<u16>> {
+        let (columns, rows) = terminal::size()?;
+
+        Ok(Size {
             width: columns,
             height: rows,
-        }
+        })
     }
 
     pub fn read(&mut self) -> Option<event::KeyEvent> {
+        // TODO: log
         let event = event::read().unwrap();
 
         match event {
@@ -133,7 +142,6 @@ impl Terminal {
     }
 
     pub fn enter_normal_mode(&mut self) {
-        self.window.get_active_buffer_mut().enter_normal_mode();
         self.set_cursor_blinking_block();
     }
 
@@ -142,7 +150,6 @@ impl Terminal {
     }
 
     pub fn enter_insert_mode(&mut self) {
-        self.window.get_active_buffer_mut().enter_insert_mode();
         self.set_cursor_blinking_bar();
     }
 

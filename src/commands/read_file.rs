@@ -17,7 +17,8 @@ impl ReadFileCommand {
                 buffer.file_name = Some(String::from(file_name));
             }
             let mut content = String::new();
-            let mut file = File::open(buffer.file_name.as_ref().unwrap()).unwrap();
+            let file_path = buffer.file_name.as_ref().unwrap();
+            let mut file = File::open(file_path).unwrap();
             file.read_to_string(&mut content).unwrap();
             buffer.set_content(content);
         }

@@ -1,49 +1,50 @@
 pub mod buffer;
 pub mod commands;
 pub mod core;
+pub mod palette;
 pub mod plugins;
 pub mod terminal;
 pub mod window;
 
-use std::io::{stdout, Result};
+use std::io::Result;
 
-use plugins::explorer::explorer_buffer::create_explorer_buffer;
-
-use crate::core::Size;
-use crate::terminal::Terminal;
-use crate::window::Window;
+use crate::{
+    palette::Palette,
+    terminal::{Terminal, TerminalEvent},
+    window::Window,
+};
 
 fn main() -> Result<()> {
-    let stdout = stdout();
-
     let terminal_size = Terminal::get_terminal_size()?;
 
-    let s = Size {
-        width: terminal_size.width,
-        height: terminal_size.height - 2,
-    };
-
     let mut window = Window::new(terminal_size);
-    let cur_dir = std::env::current_dir().unwrap().display().to_string();
-    let explorer_buf = create_explorer_buffer(cur_dir, s);
-    window.buffers.push(explorer_buf);
-    // window.create_new_buffer();
+    window.create_new_buffer();
 
-    let mut terminal = Terminal {
-        stdout,
-        window,
-        stop_requested: true,
-    };
+    let mut terminal = Terminal::new();
 
-    terminal.start();
+    terminal.initialize()?;
 
-    while !terminal.stop_requested {
-        if let Some(key_event) = terminal.read() {
-            terminal.handle_key_press(key_event);
+    let palette = Palette::new(&window);
+    terminal.redraw(&palette)?;
+
+    terminal.read()?;
+
+    while let Ok(event) = terminal.read() {
+        match event {
+            TerminalEvent::Resize(size) => window.set_size(size.width, size.height),
+            TerminalEvent::Key(key) => {
+                if key.ctrl && key.code == String::from("c") {
+                    break;
+                }
+                window.get_active_buffer_mut().handle_key(key);
+            }
         }
+
+        let palette = Palette::new(&window);
+        terminal.redraw(&palette)?;
     }
 
-    terminal.end();
+    terminal.terminate()?;
 
     Ok(())
 }

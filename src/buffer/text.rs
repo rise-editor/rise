@@ -14,6 +14,10 @@ impl Buffer {
     }
 
     pub fn get_line_visible_text(&self, row: usize) -> String {
+        if self.lines.len() <= row {
+            return String::new();
+        }
+
         let line = self.get_line(row);
 
         let start_index = self.scroll.x;

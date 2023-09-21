@@ -72,7 +72,7 @@ impl Palette {
         }
 
         for y in 0..buffer.area.height {
-            let line = buffer.get_line_visible_text(y as usize);
+            let line = buffer.get_line_visible_text(buffer.scroll.y + y as usize);
 
             palette.print(y + 1, 0, &line);
         }

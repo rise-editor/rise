@@ -41,14 +41,16 @@ impl Terminal {
 
 impl Terminal {
     pub fn initialize(&mut self) -> Result<()> {
-        crossterm::execute!(&self.stdout, terminal::EnterAlternateScreen)?;
+        crossterm::queue!(&self.stdout, terminal::EnterAlternateScreen)?;
         terminal::enable_raw_mode()?;
+        self.flush()?;
         Ok(())
     }
 
     pub fn terminate(&mut self) -> Result<()> {
-        crossterm::execute!(&self.stdout, terminal::LeaveAlternateScreen)?;
+        crossterm::queue!(&self.stdout, terminal::LeaveAlternateScreen)?;
         terminal::disable_raw_mode()?;
+        self.flush()?;
         Ok(())
     }
 

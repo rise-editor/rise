@@ -27,8 +27,6 @@ fn main() -> Result<()> {
     let palette = Palette::new(&window);
     terminal.redraw(&palette)?;
 
-    terminal.read()?;
-
     while let Ok(event) = terminal.read() {
         match event {
             TerminalEvent::Resize(size) => window.set_size(size.width, size.height),

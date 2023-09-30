@@ -36,7 +36,7 @@ fn main() -> Result<()> {
                 if key.ctrl && key.code == String::from("c") {
                     break;
                 }
-                editor.get_active_window_mut().get_active_buffer_mut().handle_key(key);
+                editor.handle_key(key);
             }
         }
 

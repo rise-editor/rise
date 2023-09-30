@@ -39,7 +39,8 @@ pub fn create_explorer_buffer(base_path: String, area: Size<u16>) -> Buffer {
         buffer.lines.push(file);
     }
 
-    buffer.actions_normal.insert("enter", |buffer| {
+    buffer.actions_normal.insert("enter", |editor| {
+        let buffer = editor.get_active_buffer_mut();
         let dir = buffer.file_name.as_ref().unwrap();
         let file = buffer.get_current_line().clone();
         let path = format!("{}/{}", dir, file);

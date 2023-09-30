@@ -1,6 +1,5 @@
 pub mod actions;
 pub mod command;
-pub mod handle_key;
 pub mod maps;
 pub mod mode;
 pub mod movement;
@@ -11,15 +10,20 @@ pub mod text;
 
 use std::collections::HashMap;
 
-use crate::buffer::{
-    maps::{
-        get_default_command_maps, get_default_insert_maps, get_default_normal_maps,
-        get_default_visual_maps,
-    },
-    mode::BufferMode,
-    select::Select,
-};
 use crate::core::{editable_text::EditableText, Point, Size};
+use crate::{
+    buffer::{
+        maps::{
+            get_default_command_maps, get_default_insert_maps, get_default_normal_maps,
+            get_default_visual_maps,
+        },
+        mode::BufferMode,
+        select::Select,
+    },
+    editor::Editor,
+};
+
+pub type ActionMap = HashMap<&'static str, fn(&mut Editor)>;
 
 pub struct Buffer {
     pub file_name: Option<String>,
@@ -30,10 +34,10 @@ pub struct Buffer {
     pub lines: Vec<String>,
     pub select: Select,
     pub command: EditableText,
-    pub actions_command: HashMap<&'static str, fn(&mut Buffer)>,
-    pub actions_insert: HashMap<&'static str, fn(&mut Buffer)>,
-    pub actions_normal: HashMap<&'static str, fn(&mut Buffer)>,
-    pub actions_visual: HashMap<&'static str, fn(&mut Buffer)>,
+    pub actions_command: ActionMap,
+    pub actions_insert: ActionMap,
+    pub actions_normal: ActionMap,
+    pub actions_visual: ActionMap,
 }
 
 impl Buffer {

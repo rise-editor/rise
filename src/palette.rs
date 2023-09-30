@@ -80,6 +80,14 @@ impl Palette {
 
         palette.print(palette.size.height - 1, 0, &format!("{}", buffer.mode));
 
+        if let BufferMode::Command = buffer.mode {
+            palette.print(
+                palette.size.height - 2,
+                0,
+                &format!(":{}", buffer.command.text),
+            );
+        }
+
         palette
     }
 }

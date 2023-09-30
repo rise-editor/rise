@@ -1,8 +1,8 @@
 use crate::{
     buffer::mode::BufferMode,
     core::{Point, Size},
+    editor::Editor,
     terminal::CursorStyle,
-    window::Window,
 };
 
 pub struct Cell {
@@ -57,7 +57,8 @@ impl Palette {
         palette
     }
 
-    pub fn new(window: &Window) -> Self {
+    pub fn new(editor: &Editor) -> Self {
+        let window = editor.get_active_window();
         let mut palette = Palette::from(window.size.height, window.size.width);
 
         palette.cursor.x = window.get_active_buffer_visible_x(window.get_active_buffer().cursor.x);

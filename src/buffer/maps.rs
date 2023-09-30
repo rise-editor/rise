@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::buffer::actions::find_next_word_position::find_next_word_position;
+use crate::{
+    buffer::actions::find_next_word_position::find_next_word_position, core::Size,
+    plugins::explorer::explorer_buffer::create_explorer_buffer,
+};
 
 use super::ActionMap;
 
@@ -104,7 +107,23 @@ pub fn get_default_command_maps() -> ActionMap {
         editor.get_active_buffer_mut().enter_normal_mode()
     });
     map.insert("enter", |editor| {
-        editor.get_active_buffer_mut().run_command()
+        // TODO: Move this
+        let command = editor.get_active_buffer().command.text.trim();
+        if command == "e" {
+            let window = editor.get_active_window();
+            let buffer = create_explorer_buffer(
+                String::from("."),
+                Size {
+                    width: window.size.width,
+                    height: window.size.height - 2,
+                },
+            );
+            let window = editor.get_active_window_mut();
+            window.buffers.push(buffer);
+            window.active_buffer = window.buffers.len() - 1;
+        } else {
+            editor.get_active_buffer_mut().run_command()
+        }
     });
     map.insert("backspace", |editor| {
         editor.get_active_buffer_mut().command.delete_char()

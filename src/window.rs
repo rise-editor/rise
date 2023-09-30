@@ -7,6 +7,7 @@ pub struct Window {
     pub position: Point<u16>,
     pub size: Size<u16>,
     pub buffers: Vec<Buffer>,
+    pub active_buffer: usize,
 }
 
 impl Window {
@@ -15,6 +16,7 @@ impl Window {
             position: Point { x: 0, y: 0 },
             size,
             buffers: vec![],
+            active_buffer: 0,
         }
     }
 
@@ -28,11 +30,11 @@ impl Window {
     }
 
     pub fn get_active_buffer(&self) -> &Buffer {
-        self.buffers.get(0).unwrap()
+        self.buffers.get(self.active_buffer).unwrap()
     }
 
     pub fn get_active_buffer_mut(&mut self) -> &mut Buffer {
-        self.buffers.get_mut(0).unwrap()
+        self.buffers.get_mut(self.active_buffer).unwrap()
     }
 
     pub fn set_size(&mut self, width: u16, height: u16) {

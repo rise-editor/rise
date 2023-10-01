@@ -13,23 +13,23 @@ impl Buffer {
         self.lines.get_mut(row).unwrap()
     }
 
-    pub fn get_line_visible_text(&self, row: usize) -> String {
+    pub fn get_line_visible_text(&self, row: usize) -> Option<String> {
         if self.lines.len() <= row {
-            return String::new();
+            return None;
         }
 
         let line = self.get_line(row);
 
         let start_index = self.scroll.x;
         if line.len() <= start_index {
-            return String::new();
+            return Some(String::new());
         }
         let end_index = min(
             line.len(),
             self.scroll.x + (self.area.width as usize),
         );
 
-        line[start_index..end_index].to_string()
+        Some(line[start_index..end_index].to_string())
     }
 
     pub fn get_line_max_cursor_x(&self, row: usize) -> usize {

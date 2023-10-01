@@ -72,7 +72,8 @@ impl Palette {
         let window = editor.get_active_window();
         let mut palette = Palette::from(editor.size.height, editor.size.width);
 
-        palette.cursor.x = window.get_active_buffer_visible_x(window.get_active_buffer().cursor.x);
+        palette.cursor.x =
+            window.get_active_buffer_visible_x(window.get_active_buffer().cursor.x) + 5;
         palette.cursor.y = window.get_active_buffer_visible_y(window.get_active_buffer().cursor.y);
 
         let buffer = window.get_active_buffer();
@@ -88,10 +89,20 @@ impl Palette {
             None => palette.print(0, 0, &String::from("[No Name]")),
         }
 
-        for y in 0..buffer.area.height {
-            let line = buffer.get_line_visible_text(buffer.scroll.y + y as usize);
+        let number_column_width = buffer.lines.len().to_string().len();
 
-            palette.print(y + 1, 0, &line);
+        for y in 0..buffer.area.height {
+            let row_index = buffer.scroll.y + y as usize;
+            match buffer.get_line_visible_text(row_index) {
+                Some(text) => {
+                    palette.print(
+                        y + 1,
+                        0,
+                        &format!(" {:>2$} {}", row_index + 1, text, number_column_width),
+                    );
+                }
+                None => palette.print(y + 1, 0, &format!("~")),
+            }
         }
 
         palette.print(palette.size.height - 1, 0, &format!("{}", buffer.mode));

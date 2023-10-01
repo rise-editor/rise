@@ -97,7 +97,8 @@ impl Palette {
         palette.print(palette.size.height - 1, 0, &format!("{}", buffer.mode));
 
         if let BufferMode::Command = buffer.mode {
-            let command_row = palette.size.height - 2;
+            let command_row = palette.size.height - 1;
+            palette.clear_row(command_row);
             palette.print(command_row, 0, &format!(":{}", buffer.command.text));
 
             palette.cursor.x = buffer.command.cursor_x as u16 + 1;
@@ -109,7 +110,15 @@ impl Palette {
 }
 
 impl Palette {
-    fn print(&mut self, row: u16, column: u16, text: &String) {
+    pub fn clear_row(&mut self, row: u16) {
+        let columns = self.rows.get_mut(row as usize).unwrap();
+
+        for column in columns.iter_mut() {
+            column.char = ' ';
+        }
+    }
+
+    pub fn print(&mut self, row: u16, column: u16, text: &String) {
         let columns = self.rows.get_mut(row as usize).unwrap();
         let mut column_index = column as usize;
         let mut chars = text.chars();

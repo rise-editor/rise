@@ -115,7 +115,7 @@ pub fn get_default_command_maps() -> ActionMap {
                 String::from("."),
                 Size {
                     width: window.size.width,
-                    height: window.size.height - 2,
+                    height: window.size.height,
                 },
             );
             let window = editor.get_active_window_mut();

@@ -122,7 +122,7 @@ pub fn get_default_command_maps() -> ActionMap {
             window.buffers.push(buffer);
             window.active_buffer = window.buffers.len() - 1;
         } else {
-            editor.get_active_buffer_mut().run_command()
+            editor.get_active_buffer_mut().run_command();
         }
     });
     map.insert("backspace", |editor| {

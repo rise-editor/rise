@@ -72,7 +72,10 @@ impl Palette {
         let tab = editor.get_active_tab();
         let mut palette = Palette::new(editor.size.height, editor.size.width);
 
-        palette.cursor.x = tab.get_active_buffer_visible_x(tab.get_active_buffer().cursor.x) + 5;
+        let number_column_width = tab.get_active_buffer().lines.len().to_string().len();
+
+        palette.cursor.x = tab.get_active_buffer_visible_x(tab.get_active_buffer().cursor.x);
+        palette.cursor.x += number_column_width as u16 + 2;
         palette.cursor.y = tab.get_active_buffer_visible_y(tab.get_active_buffer().cursor.y);
 
         let buffer = tab.get_active_buffer();
@@ -87,8 +90,6 @@ impl Palette {
             Some(name) => palette.print(0, 0, &format!("{}", name)),
             None => palette.print(0, 0, &String::from("[No Name]")),
         }
-
-        let number_column_width = buffer.lines.len().to_string().len();
 
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;

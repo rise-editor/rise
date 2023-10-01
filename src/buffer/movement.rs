@@ -97,9 +97,9 @@ pub mod tests {
         buffer.move_right();
         buffer.move_right();
         buffer.move_right();
-        assert_eq!("45678", buffer.get_line_visible_text(0));
-        assert_eq!("de", buffer.get_line_visible_text(1));
-        assert_eq!("", buffer.get_line_visible_text(2));
+        assert_eq!("45678", buffer.get_line_visible_text(0).unwrap());
+        assert_eq!("de", buffer.get_line_visible_text(1).unwrap());
+        assert_eq!("", buffer.get_line_visible_text(2).unwrap());
         buffer.move_right();
         buffer.move_right();
         buffer.move_right();
@@ -108,15 +108,15 @@ pub mod tests {
         assert_eq!(4, buffer.cursor.x);
         assert_eq!(1, buffer.cursor.y);
         buffer.move_first_column();
-        assert_eq!("12345", buffer.get_line_visible_text(0));
-        assert_eq!("abcde", buffer.get_line_visible_text(1));
-        assert_eq!("", buffer.get_line_visible_text(2));
+        assert_eq!("12345", buffer.get_line_visible_text(0).unwrap());
+        assert_eq!("abcde", buffer.get_line_visible_text(1).unwrap());
+        assert_eq!("", buffer.get_line_visible_text(2).unwrap());
         buffer.move_up();
         buffer.move_up();
         buffer.move_last_column();
-        assert_eq!("67890", buffer.get_line_visible_text(0));
-        assert_eq!("", buffer.get_line_visible_text(1));
-        assert_eq!("", buffer.get_line_visible_text(2));
+        assert_eq!("67890", buffer.get_line_visible_text(0).unwrap());
+        assert_eq!("", buffer.get_line_visible_text(1).unwrap());
+        assert_eq!("", buffer.get_line_visible_text(2).unwrap());
     }
 
     #[test]

@@ -1,57 +1,57 @@
 use crate::{
     buffer::{mode::BufferMode, Buffer},
     core::{key::Key, Size},
-    window::Window,
+    tab::Tab,
 };
 
 pub struct Editor {
     pub size: Size<u16>,
-    pub windows: Vec<Window>,
-    pub active_window: usize,
+    pub tabs: Vec<Tab>,
+    pub active_tab: usize,
 }
 
 impl Editor {
     pub fn new(size: Size<u16>) -> Self {
         Self {
             size,
-            windows: vec![],
-            active_window: 0,
+            tabs: vec![],
+            active_tab: 0,
         }
     }
 
-    pub fn create_new_window(&mut self) -> &mut Window {
-        let window = Window::new(Size {
+    pub fn create_new_tab(&mut self) -> &mut Tab {
+        let tab = Tab::new(Size {
             width: self.size.width,
             height: self.size.height - 2,
         });
 
-        self.windows.push(window);
+        self.tabs.push(tab);
 
-        self.windows.last_mut().unwrap()
+        self.tabs.last_mut().unwrap()
     }
 
-    pub fn get_active_window(&self) -> &Window {
-        self.windows.get(self.active_window).unwrap()
+    pub fn get_active_tab(&self) -> &Tab {
+        self.tabs.get(self.active_tab).unwrap()
     }
 
-    pub fn get_active_window_mut(&mut self) -> &mut Window {
-        self.windows.get_mut(self.active_window).unwrap()
+    pub fn get_active_tab_mut(&mut self) -> &mut Tab {
+        self.tabs.get_mut(self.active_tab).unwrap()
     }
 
     pub fn get_active_buffer(&self) -> &Buffer {
-        self.get_active_window().get_active_buffer()
+        self.get_active_tab().get_active_buffer()
     }
 
     pub fn get_active_buffer_mut(&mut self) -> &mut Buffer {
-        self.get_active_window_mut().get_active_buffer_mut()
+        self.get_active_tab_mut().get_active_buffer_mut()
     }
 
     pub fn set_size(&mut self, width: u16, height: u16) {
         self.size.width = width;
         self.size.height = height;
 
-        for window in self.windows.iter_mut() {
-            window.set_size(width, height)
+        for tab in self.tabs.iter_mut() {
+            tab.set_size(width, height)
         }
     }
 

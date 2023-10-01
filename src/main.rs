@@ -4,8 +4,8 @@ pub mod core;
 pub mod editor;
 pub mod palette;
 pub mod plugins;
+pub mod tab;
 pub mod terminal;
-pub mod window;
 
 use std::io::Result;
 
@@ -19,8 +19,8 @@ fn main() -> Result<()> {
     let terminal_size = Terminal::get_terminal_size()?;
 
     let mut editor = Editor::new(terminal_size);
-    let window = editor.create_new_window();
-    window.create_new_buffer();
+    let tab = editor.create_new_tab();
+    tab.create_new_buffer();
 
     let mut terminal = Terminal::new();
 

@@ -69,14 +69,13 @@ impl Palette {
     }
 
     pub fn new(editor: &Editor) -> Self {
-        let window = editor.get_active_window();
+        let tab = editor.get_active_tab();
         let mut palette = Palette::from(editor.size.height, editor.size.width);
 
-        palette.cursor.x =
-            window.get_active_buffer_visible_x(window.get_active_buffer().cursor.x) + 5;
-        palette.cursor.y = window.get_active_buffer_visible_y(window.get_active_buffer().cursor.y);
+        palette.cursor.x = tab.get_active_buffer_visible_x(tab.get_active_buffer().cursor.x) + 5;
+        palette.cursor.y = tab.get_active_buffer_visible_y(tab.get_active_buffer().cursor.y);
 
-        let buffer = window.get_active_buffer();
+        let buffer = tab.get_active_buffer();
 
         match buffer.mode {
             BufferMode::Insert => palette.cursor_style = CursorStyle::BlinkingBar,

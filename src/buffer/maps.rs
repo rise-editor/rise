@@ -110,17 +110,17 @@ pub fn get_default_command_maps() -> ActionMap {
         // TODO: Move this
         let command = editor.get_active_buffer().command.text.trim();
         if command == "e" {
-            let window = editor.get_active_window();
+            let tab = editor.get_active_tab();
             let buffer = create_explorer_buffer(
                 String::from("."),
                 Size {
-                    width: window.size.width,
-                    height: window.size.height,
+                    width: tab.size.width,
+                    height: tab.size.height,
                 },
             );
-            let window = editor.get_active_window_mut();
-            window.buffers.push(buffer);
-            window.active_buffer = window.buffers.len() - 1;
+            let tab = editor.get_active_tab_mut();
+            tab.buffers.push(buffer);
+            tab.active_buffer = tab.buffers.len() - 1;
         } else {
             editor.get_active_buffer_mut().run_command();
         }

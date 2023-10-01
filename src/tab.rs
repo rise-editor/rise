@@ -3,14 +3,14 @@ use crate::{
     core::{Point, Size},
 };
 
-pub struct Window {
+pub struct Tab {
     pub position: Point<u16>,
     pub size: Size<u16>,
     pub buffers: Vec<Buffer>,
     pub active_buffer: usize,
 }
 
-impl Window {
+impl Tab {
     pub fn new(size: Size<u16>) -> Self {
         Self {
             position: Point { x: 0, y: 0 },

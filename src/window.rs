@@ -23,7 +23,7 @@ impl Window {
     pub fn create_new_buffer(&mut self) {
         let buffer = Buffer::new(Size {
             width: self.size.width,
-            height: self.size.height - 2,
+            height: self.size.height,
         });
 
         self.buffers.push(buffer);

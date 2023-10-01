@@ -5,6 +5,7 @@ use crate::{
     terminal::CursorStyle,
 };
 
+#[derive(Clone, Eq, PartialEq)]
 pub struct Cell {
     pub char: char,
     pub color: (u8, u8, u8),
@@ -12,6 +13,19 @@ pub struct Cell {
     pub bold: bool,
     pub underline: bool,
     pub italic: bool,
+}
+
+impl Cell {
+    pub fn new() -> Self {
+        Self {
+            char: ' ',
+            color: (255, 255, 255),
+            background_color: (34, 39, 46),
+            bold: false,
+            underline: false,
+            italic: false,
+        }
+    }
 }
 
 pub struct Palette {
@@ -35,18 +49,15 @@ impl Palette {
             rows: vec![],
         };
 
-        for _ in 0..palette.size.height {
+        for row_index in 0..palette.size.height {
             let mut row: Vec<Cell> = vec![];
 
             for _ in 0..palette.size.width {
-                let cell = Cell {
-                    char: ' ',
-                    color: (255, 255, 255),
-                    background_color: (0, 0, 0),
-                    bold: false,
-                    italic: false,
-                    underline: false,
-                };
+                let mut cell = Cell::new();
+
+                if row_index == 0 {
+                    cell.background_color = (125, 125, 125);
+                }
 
                 row.push(cell);
             }
@@ -59,7 +70,7 @@ impl Palette {
 
     pub fn new(editor: &Editor) -> Self {
         let window = editor.get_active_window();
-        let mut palette = Palette::from(window.size.height, window.size.width);
+        let mut palette = Palette::from(editor.size.height, editor.size.width);
 
         palette.cursor.x = window.get_active_buffer_visible_x(window.get_active_buffer().cursor.x);
         palette.cursor.y = window.get_active_buffer_visible_y(window.get_active_buffer().cursor.y);
@@ -72,6 +83,11 @@ impl Palette {
             _ => {}
         }
 
+        match &buffer.file_name {
+            Some(name) => palette.print(0, 0, &format!("{}", name)),
+            None => palette.print(0, 0, &String::from("[No Name]")),
+        }
+
         for y in 0..buffer.area.height {
             let line = buffer.get_line_visible_text(buffer.scroll.y + y as usize);
 
@@ -81,11 +97,11 @@ impl Palette {
         palette.print(palette.size.height - 1, 0, &format!("{}", buffer.mode));
 
         if let BufferMode::Command = buffer.mode {
-            palette.print(
-                palette.size.height - 2,
-                0,
-                &format!(":{}", buffer.command.text),
-            );
+            let command_row = palette.size.height - 2;
+            palette.print(command_row, 0, &format!(":{}", buffer.command.text));
+
+            palette.cursor.x = buffer.command.cursor_x as u16 + 1;
+            palette.cursor.y = command_row;
         }
 
         palette

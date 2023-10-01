@@ -26,7 +26,7 @@ fn main() -> Result<()> {
 
     terminal.initialize()?;
 
-    let palette = Palette::new(&editor);
+    let palette = Palette::from(&editor);
     terminal.redraw(&palette)?;
 
     while let Ok(event) = terminal.read() {
@@ -40,7 +40,7 @@ fn main() -> Result<()> {
             }
         }
 
-        let palette = Palette::new(&editor);
+        let palette = Palette::from(&editor);
         terminal.redraw(&palette)?;
     }
 

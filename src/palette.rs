@@ -36,7 +36,7 @@ pub struct Palette {
 }
 
 impl Palette {
-    pub fn from(rows: u16, columns: u16) -> Self {
+    pub fn new(rows: u16, columns: u16) -> Self {
         let cursor = Point { x: 0, y: 0 };
 
         let mut palette = Palette {
@@ -68,9 +68,9 @@ impl Palette {
         palette
     }
 
-    pub fn new(editor: &Editor) -> Self {
+    pub fn from(editor: &Editor) -> Self {
         let tab = editor.get_active_tab();
-        let mut palette = Palette::from(editor.size.height, editor.size.width);
+        let mut palette = Palette::new(editor.size.height, editor.size.width);
 
         palette.cursor.x = tab.get_active_buffer_visible_x(tab.get_active_buffer().cursor.x) + 5;
         palette.cursor.y = tab.get_active_buffer_visible_y(tab.get_active_buffer().cursor.y);

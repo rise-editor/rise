@@ -8,22 +8,24 @@ pub struct Editor {
     pub size: Size<u16>,
     pub tabs: Vec<Tab>,
     pub active_tab: usize,
+    pub document_area: Size<u16>,
 }
 
 impl Editor {
     pub fn new(size: Size<u16>) -> Self {
         Self {
-            size,
+            size: size.clone(),
             tabs: vec![],
             active_tab: 0,
+            document_area: Size {
+                width: size.width,
+                height: size.height - 2,
+            },
         }
     }
 
     pub fn create_new_tab(&mut self) -> &mut Tab {
-        let tab = Tab::new(Size {
-            width: self.size.width,
-            height: self.size.height - 2,
-        });
+        let tab = Tab::new(self.document_area.clone());
 
         self.tabs.push(tab);
 
@@ -49,9 +51,11 @@ impl Editor {
     pub fn set_size(&mut self, width: u16, height: u16) {
         self.size.width = width;
         self.size.height = height;
+        self.document_area.width = width;
+        self.document_area.height = height - 2;
 
         for tab in self.tabs.iter_mut() {
-            tab.set_size(width, height)
+            tab.set_size(self.document_area.width, self.document_area.height);
         }
     }
 

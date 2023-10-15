@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    buffer::actions::find_next_word_position::find_next_word_position, core::Size,
+    buffer::actions::find_next_word_position::find_next_word_position,
     plugins::explorer::explorer_buffer::create_explorer_buffer,
 };
 
@@ -111,13 +111,7 @@ pub fn get_default_command_maps() -> ActionMap {
         let command = editor.get_active_buffer().command.text.trim();
         if command == "e" {
             let tab = editor.get_active_tab();
-            let buffer = create_explorer_buffer(
-                String::from("."),
-                Size {
-                    width: tab.size.width,
-                    height: tab.size.height,
-                },
-            );
+            let buffer = create_explorer_buffer(String::from("."), tab.area.clone());
             let tab = editor.get_active_tab_mut();
             tab.buffers.push(buffer);
             tab.active_buffer = tab.buffers.len() - 1;

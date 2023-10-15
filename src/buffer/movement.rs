@@ -9,14 +9,14 @@ impl Buffer {
 
         if self.cursor.x < self.scroll.x {
             self.scroll.x = self.cursor.x
-        } else if self.scroll.x + (self.area.width as usize) <= self.cursor.x {
-            self.scroll.x = self.cursor.x - (self.area.width as usize) + 1;
+        } else if self.scroll.x + (self.text_area.width as usize) <= self.cursor.x {
+            self.scroll.x = self.cursor.x - (self.text_area.width as usize) + 1;
         }
 
         if self.cursor.y < self.scroll.y {
             self.scroll.y = self.cursor.y;
-        } else if self.scroll.y + (self.area.height as usize) <= self.cursor.y {
-            self.scroll.y = self.cursor.y - (self.area.height as usize) + 1;
+        } else if self.scroll.y + (self.text_area.height as usize) <= self.cursor.y {
+            self.scroll.y = self.cursor.y - (self.text_area.height as usize) + 1;
         }
     }
 
@@ -59,13 +59,13 @@ impl Buffer {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{buffer::Buffer, core::Size};
+    use crate::{buffer::Buffer, core::Rectangle};
 
     fn create_buffer() -> Buffer {
-        Buffer::new(Size {
-            width: 5,
-            height: 5,
-        })
+        let mut area = Rectangle::<u16>::zero();
+        area.width = 8;
+        area.height = 5;
+        Buffer::new(area)
     }
 
     #[test]

@@ -27,6 +27,7 @@ impl Buffer {
         } else {
             line.remove(column);
             self.move_cursor(row, column);
+            self.set_size(self.area.clone());
         }
     }
 
@@ -48,6 +49,7 @@ impl Buffer {
     pub fn insert_newline(&mut self, row: usize) {
         self.lines.insert(row, String::new());
         self.move_cursor(row, 0);
+        self.set_size(self.area.clone());
     }
 
     pub fn split_line(&mut self, row: usize, column: usize) {
@@ -61,6 +63,7 @@ impl Buffer {
         self.lines.insert(row + 1, right_string);
 
         self.move_cursor(row + 1, 0);
+        self.set_size(self.area.clone());
     }
 
     pub fn join_lines(&mut self, row1: usize, row2: usize) {
@@ -68,6 +71,7 @@ impl Buffer {
         let line1 = self.get_line_mut(row1);
         line1.push_str(&line2);
         self.lines.remove(row2);
+        self.set_size(self.area.clone());
     }
 }
 

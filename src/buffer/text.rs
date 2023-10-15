@@ -24,10 +24,7 @@ impl Buffer {
         if line.len() <= start_index {
             return Some(String::new());
         }
-        let end_index = min(
-            line.len(),
-            self.scroll.x + (self.area.width as usize),
-        );
+        let end_index = min(line.len(), self.scroll.x + (self.text_area.width as usize));
 
         Some(line[start_index..end_index].to_string())
     }

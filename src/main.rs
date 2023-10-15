@@ -9,6 +9,8 @@ pub mod terminal;
 
 use std::io::Result;
 
+use crate::core::Rectangle;
+
 use crate::{
     editor::Editor,
     palette::Palette,
@@ -17,8 +19,9 @@ use crate::{
 
 fn main() -> Result<()> {
     let terminal_size = Terminal::get_terminal_size()?;
+    let editor_area: Rectangle<u16> = Rectangle::<u16>::from_size(terminal_size);
 
-    let mut editor = Editor::new(terminal_size);
+    let mut editor = Editor::new(editor_area);
     let tab = editor.create_new_tab();
     tab.create_new_buffer();
 
@@ -31,7 +34,7 @@ fn main() -> Result<()> {
 
     while let Ok(event) = terminal.read() {
         match event {
-            TerminalEvent::Resize(size) => editor.set_size(size.width, size.height),
+            TerminalEvent::Resize(size) => editor.set_size(Rectangle::<u16>::from_size(size)),
             TerminalEvent::Key(key) => {
                 if key.ctrl && key.code == String::from("c") {
                     break;

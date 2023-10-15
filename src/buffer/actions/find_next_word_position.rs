@@ -62,15 +62,15 @@ pub fn find_next_word_position(buffer: &Buffer) -> Point<usize> {
 mod tests {
     use crate::{
         buffer::{actions::find_next_word_position::find_next_word_position, Buffer},
-        core::Size,
+        core::Rectangle,
     };
 
     #[test]
     fn test() {
-        let mut buffer = Buffer::new(Size {
-            width: 10,
-            height: 10,
-        });
+        let mut area = Rectangle::<u16>::zero();
+        area.width = 10;
+        area.height = 10;
+        let mut buffer = Buffer::new(area);
 
         let mut position = find_next_word_position(&buffer);
 

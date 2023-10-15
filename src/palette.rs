@@ -70,15 +70,12 @@ impl Palette {
 
     pub fn from(editor: &Editor) -> Self {
         let tab = editor.get_active_tab();
-        let mut palette = Palette::new(editor.size.height, editor.size.width);
-
-        let number_column_width = tab.get_active_buffer().lines.len().to_string().len();
-
-        palette.cursor.x = tab.get_active_buffer_visible_x(tab.get_active_buffer().cursor.x);
-        palette.cursor.x += number_column_width as u16 + 2;
-        palette.cursor.y = tab.get_active_buffer_visible_y(tab.get_active_buffer().cursor.y);
+        let mut palette = Palette::new(editor.area.height, editor.area.width);
 
         let buffer = tab.get_active_buffer();
+
+        palette.cursor.x = buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16;
+        palette.cursor.y = buffer.text_area.y + (buffer.cursor.y - buffer.scroll.y) as u16;
 
         match buffer.mode {
             BufferMode::Insert => palette.cursor_style = CursorStyle::BlinkingBar,
@@ -91,6 +88,8 @@ impl Palette {
             None => palette.print(0, 0, &String::from("[No Name]")),
         }
 
+        let info_area_width = buffer.info_area.width as usize - 2;
+
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
             match buffer.get_line_visible_text(row_index) {
@@ -98,7 +97,7 @@ impl Palette {
                     palette.print(
                         y + 1,
                         0,
-                        &format!(" {:>2$} {}", row_index + 1, text, number_column_width),
+                        &format!(" {:>2$} {}", row_index + 1, text, info_area_width),
                     );
                 }
                 None => palette.print(y + 1, 0, &format!("~")),

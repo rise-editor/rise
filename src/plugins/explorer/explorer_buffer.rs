@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use crate::{buffer::Buffer, core::Size};
+use crate::{buffer::Buffer, core::Rectangle};
 
 fn get_file_list(directory: &String) -> Vec<String> {
     let paths = fs::read_dir(directory).unwrap();
@@ -28,7 +28,7 @@ fn get_file_list(directory: &String) -> Vec<String> {
     files
 }
 
-pub fn create_explorer_buffer(base_path: String, area: Size<u16>) -> Buffer {
+pub fn create_explorer_buffer(base_path: String, area: Rectangle<u16>) -> Buffer {
     let files = get_file_list(&base_path);
 
     let mut buffer = Buffer::new(area);

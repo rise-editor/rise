@@ -1,27 +1,31 @@
 use crate::{
     buffer::{mode::BufferMode, Buffer},
-    core::{key::Key, Size},
+    core::{key::Key, Rectangle},
     tab::Tab,
 };
 
 pub struct Editor {
-    pub size: Size<u16>,
+    pub area: Rectangle<u16>,
+    pub tabs_area: Rectangle<u16>,
+    pub document_area: Rectangle<u16>,
+    pub status_area: Rectangle<u16>,
     pub tabs: Vec<Tab>,
     pub active_tab: usize,
-    pub document_area: Size<u16>,
 }
 
 impl Editor {
-    pub fn new(size: Size<u16>) -> Self {
-        Self {
-            size: size.clone(),
+    pub fn new(area: Rectangle<u16>) -> Self {
+        let mut editor = Self {
+            area: area.clone(),
+            tabs_area: Rectangle::zero(),
+            document_area: Rectangle::zero(),
+            status_area: Rectangle::zero(),
             tabs: vec![],
             active_tab: 0,
-            document_area: Size {
-                width: size.width,
-                height: size.height - 2,
-            },
-        }
+        };
+
+        editor.set_size(area);
+        editor
     }
 
     pub fn create_new_tab(&mut self) -> &mut Tab {
@@ -48,14 +52,19 @@ impl Editor {
         self.get_active_tab_mut().get_active_buffer_mut()
     }
 
-    pub fn set_size(&mut self, width: u16, height: u16) {
-        self.size.width = width;
-        self.size.height = height;
-        self.document_area.width = width;
-        self.document_area.height = height - 2;
+    pub fn set_size(&mut self, area: Rectangle<u16>) {
+        self.area = area.clone();
+        self.tabs_area = area.clone();
+        self.tabs_area.height = 1;
+        self.document_area = area.clone();
+        self.document_area.y += self.tabs_area.height;
+        self.document_area.height -= 2;
+        self.status_area = area.clone();
+        self.status_area.y = self.document_area.y + self.document_area.height;
+        self.status_area.height = 1;
 
         for tab in self.tabs.iter_mut() {
-            tab.set_size(self.document_area.width, self.document_area.height);
+            tab.set_size(self.document_area.clone());
         }
     }
 

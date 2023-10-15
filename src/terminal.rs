@@ -4,7 +4,7 @@ use crossterm::{cursor, event, style, terminal};
 
 use crate::{
     core::{key::Key, Size},
-    palette::Palette,
+    screen::Screen,
 };
 
 pub struct Terminal {
@@ -65,7 +65,7 @@ impl Terminal {
         }
     }
 
-    pub fn redraw(&mut self, palette: &Palette) -> Result<()> {
+    pub fn redraw(&mut self, palette: &Screen) -> Result<()> {
         self.clear()?;
         self.move_to(0, 0)?;
 

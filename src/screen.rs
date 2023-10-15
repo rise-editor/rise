@@ -28,18 +28,18 @@ impl Cell {
     }
 }
 
-pub struct Palette {
+pub struct Screen {
     pub size: Size<u16>,
     pub cursor: Point<u16>,
     pub cursor_style: CursorStyle,
     pub rows: Vec<Vec<Cell>>,
 }
 
-impl Palette {
+impl Screen {
     pub fn new(rows: u16, columns: u16) -> Self {
         let cursor = Point { x: 0, y: 0 };
 
-        let mut palette = Palette {
+        let mut palette = Self {
             cursor,
             cursor_style: CursorStyle::BlinkingBlock,
             size: Size {
@@ -70,7 +70,7 @@ impl Palette {
 
     pub fn from(editor: &Editor) -> Self {
         let tab = editor.get_active_tab();
-        let mut palette = Palette::new(editor.area.height, editor.area.width);
+        let mut palette = Screen::new(editor.area.height, editor.area.width);
 
         let buffer = tab.get_active_buffer();
 
@@ -119,7 +119,7 @@ impl Palette {
     }
 }
 
-impl Palette {
+impl Screen {
     pub fn clear_row(&mut self, row: u16) {
         let columns = self.rows.get_mut(row as usize).unwrap();
 

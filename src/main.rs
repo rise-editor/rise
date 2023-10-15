@@ -2,8 +2,8 @@ pub mod buffer;
 pub mod commands;
 pub mod core;
 pub mod editor;
-pub mod palette;
 pub mod plugins;
+pub mod screen;
 pub mod tab;
 pub mod terminal;
 
@@ -13,7 +13,7 @@ use crate::core::Rectangle;
 
 use crate::{
     editor::Editor,
-    palette::Palette,
+    screen::Screen,
     terminal::{Terminal, TerminalEvent},
 };
 
@@ -29,7 +29,7 @@ fn main() -> Result<()> {
 
     terminal.initialize()?;
 
-    let palette = Palette::from(&editor);
+    let palette = Screen::from(&editor);
     terminal.redraw(&palette)?;
 
     while let Ok(event) = terminal.read() {
@@ -43,7 +43,7 @@ fn main() -> Result<()> {
             }
         }
 
-        let palette = Palette::from(&editor);
+        let palette = Screen::from(&editor);
         terminal.redraw(&palette)?;
     }
 

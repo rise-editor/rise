@@ -77,5 +77,6 @@ impl Buffer {
         self.info_area.width = 2 + self.lines.len().to_string().len() as u16;
         self.text_area.x = self.info_area.x + self.info_area.width;
         self.text_area.width = area.width - self.info_area.width;
+        self.move_cursor(self.cursor.y, self.cursor.x);
     }
 }

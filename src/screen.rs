@@ -69,9 +69,9 @@ impl Screen {
     }
 
     pub fn from(editor: &Editor) -> Self {
-        let tab = editor.get_active_tab();
         let mut palette = Screen::new(editor.area.height, editor.area.width);
 
+        let tab = editor.get_active_tab();
         let buffer = tab.get_active_buffer();
 
         palette.cursor.x = buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16;

@@ -65,15 +65,14 @@ impl Terminal {
         }
     }
 
-    pub fn redraw(&mut self, palette: &Screen) -> Result<()> {
-        self.clear()?;
-        self.move_to(0, 0)?;
+    pub fn redraw(&mut self, screen: &Screen) -> Result<()> {
+        self.set_cursor_style(screen.cursor_style.clone())?;
 
-        self.set_cursor_style(palette.cursor_style.clone())?;
+        for row in 0..screen.size.height {
+            self.move_to(row, 0)?;
 
-        for row in 0..palette.size.height {
-            for column in 0..palette.size.width {
-                let cell = palette
+            for column in 0..screen.size.width {
+                let cell = screen
                     .rows
                     .get(row as usize)
                     .unwrap()
@@ -97,7 +96,7 @@ impl Terminal {
             }
         }
 
-        self.move_to(palette.cursor.y, palette.cursor.x)?;
+        self.move_to(screen.cursor.y, screen.cursor.x)?;
 
         self.flush()?;
 

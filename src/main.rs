@@ -29,8 +29,8 @@ fn main() -> Result<()> {
 
     terminal.initialize()?;
 
-    let palette = Screen::from(&editor);
-    terminal.redraw(&palette)?;
+    let screen = Screen::from(&editor);
+    terminal.redraw(&screen)?;
 
     while let Ok(event) = terminal.read() {
         match event {
@@ -43,8 +43,8 @@ fn main() -> Result<()> {
             }
         }
 
-        let palette = Screen::from(&editor);
-        terminal.redraw(&palette)?;
+        let screen = Screen::from(&editor);
+        terminal.redraw(&screen)?;
     }
 
     terminal.terminate()?;

@@ -39,7 +39,7 @@ impl Screen {
     pub fn new(rows: u16, columns: u16) -> Self {
         let cursor = Point { x: 0, y: 0 };
 
-        let mut palette = Self {
+        let mut screen = Self {
             cursor,
             cursor_style: CursorStyle::BlinkingBlock,
             size: Size {
@@ -49,10 +49,10 @@ impl Screen {
             rows: vec![],
         };
 
-        for row_index in 0..palette.size.height {
+        for row_index in 0..screen.size.height {
             let mut row: Vec<Cell> = vec![];
 
-            for _ in 0..palette.size.width {
+            for _ in 0..screen.size.width {
                 let mut cell = Cell::new();
 
                 if row_index == 0 {
@@ -62,30 +62,30 @@ impl Screen {
                 row.push(cell);
             }
 
-            palette.rows.push(row);
+            screen.rows.push(row);
         }
 
-        palette
+        screen
     }
 
     pub fn from(editor: &Editor) -> Self {
-        let mut palette = Screen::new(editor.area.height, editor.area.width);
+        let mut screen = Screen::new(editor.area.height, editor.area.width);
 
         let tab = editor.get_active_tab();
         let buffer = tab.get_active_buffer();
 
-        palette.cursor.x = buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16;
-        palette.cursor.y = buffer.text_area.y + (buffer.cursor.y - buffer.scroll.y) as u16;
+        screen.cursor.x = buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16;
+        screen.cursor.y = buffer.text_area.y + (buffer.cursor.y - buffer.scroll.y) as u16;
 
         match buffer.mode {
-            BufferMode::Insert => palette.cursor_style = CursorStyle::BlinkingBar,
-            BufferMode::Command => palette.cursor_style = CursorStyle::BlinkingBar,
+            BufferMode::Insert => screen.cursor_style = CursorStyle::BlinkingBar,
+            BufferMode::Command => screen.cursor_style = CursorStyle::BlinkingBar,
             _ => {}
         }
 
         match &buffer.file_name {
-            Some(name) => palette.print(0, 0, &format!("{}", name)),
-            None => palette.print(0, 0, &String::from("[No Name]")),
+            Some(name) => screen.print(0, 0, &format!("{}", name)),
+            None => screen.print(0, 0, &String::from("[No Name]")),
         }
 
         let info_area_width = buffer.info_area.width as usize - 2;
@@ -94,28 +94,28 @@ impl Screen {
             let row_index = buffer.scroll.y + y as usize;
             match buffer.get_line_visible_text(row_index) {
                 Some(text) => {
-                    palette.print(
+                    screen.print(
                         y + 1,
                         0,
                         &format!(" {:>2$} {}", row_index + 1, text, info_area_width),
                     );
                 }
-                None => palette.print(y + 1, 0, &format!("~")),
+                None => screen.print(y + 1, 0, &format!("~")),
             }
         }
 
-        palette.print(palette.size.height - 1, 0, &format!("{}", buffer.mode));
+        screen.print(screen.size.height - 1, 0, &format!("{}", buffer.mode));
 
         if let BufferMode::Command = buffer.mode {
-            let command_row = palette.size.height - 1;
-            palette.clear_row(command_row);
-            palette.print(command_row, 0, &format!(":{}", buffer.command.text));
+            let command_row = screen.size.height - 1;
+            screen.clear_row(command_row);
+            screen.print(command_row, 0, &format!(":{}", buffer.command.text));
 
-            palette.cursor.x = buffer.command.cursor_x as u16 + 1;
-            palette.cursor.y = command_row;
+            screen.cursor.x = buffer.command.cursor_x as u16 + 1;
+            screen.cursor.y = command_row;
         }
 
-        palette
+        screen
     }
 }
 

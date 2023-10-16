@@ -32,6 +32,7 @@ impl Editor {
         let tab = Tab::new(self.document_area.clone());
 
         self.tabs.push(tab);
+        self.active_tab = self.tabs.len() - 1;
 
         self.tabs.last_mut().unwrap()
     }

@@ -15,10 +15,13 @@ impl Tab {
         }
     }
 
-    pub fn create_new_buffer(&mut self) {
+    pub fn create_new_buffer(&mut self) -> &mut Buffer {
         let buffer = Buffer::new(self.area.clone());
 
         self.buffers.push(buffer);
+        self.active_buffer = self.buffers.len() - 1;
+
+        self.buffers.last_mut().unwrap()
     }
 
     pub fn get_active_buffer(&self) -> &Buffer {
@@ -35,13 +38,5 @@ impl Tab {
         for buffer in self.buffers.iter_mut() {
             buffer.set_size(self.area.clone());
         }
-    }
-
-    pub fn get_active_buffer_visible_x(&self, column: usize) -> u16 {
-        self.area.x + self.get_active_buffer().column_to_visible_x(column)
-    }
-
-    pub fn get_active_buffer_visible_y(&self, row: usize) -> u16 {
-        self.area.y + self.get_active_buffer().row_to_visible_y(row)
     }
 }

@@ -20,7 +20,7 @@ impl Cell {
         Self {
             char: ' ',
             color: (255, 255, 255),
-            background_color: (34, 39, 46),
+            background_color: (0, 0, 0),
             bold: false,
             underline: false,
             italic: false,
@@ -37,10 +37,8 @@ pub struct Screen {
 
 impl Screen {
     pub fn new(rows: u16, columns: u16) -> Self {
-        let cursor = Point { x: 0, y: 0 };
-
         let mut screen = Self {
-            cursor,
+            cursor: Point { x: 0, y: 0 },
             cursor_style: CursorStyle::BlinkingBlock,
             size: Size {
                 width: columns,
@@ -49,17 +47,11 @@ impl Screen {
             rows: vec![],
         };
 
-        for row_index in 0..screen.size.height {
+        for _ in 0..screen.size.height {
             let mut row: Vec<Cell> = vec![];
 
             for _ in 0..screen.size.width {
-                let mut cell = Cell::new();
-
-                if row_index == 0 {
-                    cell.background_color = (125, 125, 125);
-                }
-
-                row.push(cell);
+                row.push(Cell::new());
             }
 
             screen.rows.push(row);
@@ -115,6 +107,16 @@ impl Screen {
         }
 
         screen
+    }
+
+    pub fn cell(&self, row: u16, column: u16) -> Option<&Cell> {
+        if let Some(cells) = self.rows.get(row as usize) {
+            if let Some(cell) = cells.get(column as usize) {
+                return Some(cell);
+            }
+        }
+
+        None
     }
 }
 

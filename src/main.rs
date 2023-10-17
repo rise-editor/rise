@@ -30,7 +30,7 @@ fn main() -> Result<()> {
     terminal.initialize()?;
 
     let screen = Screen::from(&editor);
-    terminal.redraw(&screen)?;
+    terminal.redraw(screen, true)?;
 
     while let Ok(event) = terminal.read() {
         match event {
@@ -44,7 +44,7 @@ fn main() -> Result<()> {
         }
 
         let screen = Screen::from(&editor);
-        terminal.redraw(&screen)?;
+        terminal.redraw(screen, false)?;
     }
 
     terminal.terminate()?;

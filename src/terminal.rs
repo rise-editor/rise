@@ -1,6 +1,6 @@
 use std::io::{stdout, Result, Stdout, Write};
 
-use crossterm::{cursor, event, style, terminal};
+use crossterm::{cursor, event, style, terminal, QueueableCommand};
 
 use crate::{
     core::{key::Key, Size},
@@ -9,6 +9,7 @@ use crate::{
 
 pub struct Terminal {
     pub stdout: Stdout,
+    pub screen: Screen,
 }
 
 #[derive(Clone)]
@@ -26,7 +27,12 @@ impl Terminal {
     pub fn new() -> Self {
         let stdout = stdout();
 
-        Terminal { stdout }
+        let size = Terminal::get_terminal_size().unwrap();
+
+        Terminal {
+            stdout,
+            screen: Screen::new(size.height, size.width),
+        }
     }
 
     pub fn get_terminal_size() -> Result<Size<u16>> {
@@ -65,40 +71,64 @@ impl Terminal {
         }
     }
 
-    pub fn redraw(&mut self, screen: &Screen) -> Result<()> {
-        self.set_cursor_style(screen.cursor_style.clone())?;
+    pub fn redraw(&mut self, new_screen: Screen, force: bool) -> Result<()> {
+        self.set_cursor_style(new_screen.cursor_style.clone())?;
 
-        for row in 0..screen.size.height {
-            self.move_to(row, 0)?;
+        let mut bg = style::Color::Black;
+        let mut fg = style::Color::White;
+        let mut skipped = true;
 
-            for column in 0..screen.size.width {
-                let cell = screen
-                    .rows
-                    .get(row as usize)
-                    .unwrap()
-                    .get(column as usize)
-                    .unwrap();
+        for row in 0..new_screen.size.height {
+            for column in 0..new_screen.size.width {
+                let cell_new = new_screen.cell(row, column).unwrap();
+                let cell_old_option = self.screen.cell(row, column);
 
-                crossterm::queue!(
-                    &self.stdout,
-                    style::SetBackgroundColor(style::Color::Rgb {
-                        r: cell.background_color.0,
-                        g: cell.background_color.1,
-                        b: cell.background_color.2,
-                    }),
-                    style::SetForegroundColor(style::Color::Rgb {
-                        r: cell.color.0,
-                        g: cell.color.1,
-                        b: cell.color.2,
-                    }),
-                    style::Print(cell.char)
-                )?;
+                if !force {
+                    if let Some(cell_old) = cell_old_option {
+                        if cell_old == cell_new {
+                            skipped = true;
+                            continue;
+                        }
+                    }
+                }
+
+                if skipped {
+                    self.move_to(row, column)?;
+                }
+
+                let cell_bg = style::Color::Rgb {
+                    r: cell_new.background_color.0,
+                    g: cell_new.background_color.1,
+                    b: cell_new.background_color.2,
+                };
+
+                if bg != cell_bg {
+                    bg = cell_bg;
+                    self.stdout.queue(style::SetBackgroundColor(bg))?;
+                }
+
+                let cell_fg = style::Color::Rgb {
+                    r: cell_new.color.0,
+                    g: cell_new.color.1,
+                    b: cell_new.color.2,
+                };
+
+                if fg != cell_fg {
+                    fg = cell_fg;
+                    self.stdout.queue(style::SetForegroundColor(fg))?;
+                }
+
+                self.stdout.queue(style::Print(cell_new.char))?;
             }
+
+            skipped = true;
         }
 
-        self.move_to(screen.cursor.y, screen.cursor.x)?;
+        self.move_to(new_screen.cursor.y, new_screen.cursor.x)?;
 
         self.flush()?;
+
+        self.screen = new_screen;
 
         Ok(())
     }

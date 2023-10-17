@@ -74,18 +74,18 @@ impl Screen {
         let tab = editor.get_active_tab();
         let buffer = tab.get_active_buffer();
 
-        screen.cursor.x = buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16;
-        screen.cursor.y = buffer.text_area.y + (buffer.cursor.y - buffer.scroll.y) as u16;
+        screen.cursor = buffer.get_cursor_screen_pos();
 
         match buffer.mode {
+            BufferMode::Normal => screen.cursor_style = CursorStyle::BlinkingBlock,
+            BufferMode::Visual => screen.cursor_style = CursorStyle::BlinkingBlock,
             BufferMode::Insert => screen.cursor_style = CursorStyle::BlinkingBar,
             BufferMode::Command => screen.cursor_style = CursorStyle::BlinkingBar,
-            _ => {}
         }
 
         match &buffer.file_name {
-            Some(name) => screen.print(0, 0, &format!("{}", name)),
-            None => screen.print(0, 0, &String::from("[No Name]")),
+            Some(name) => screen.print(0, 0, &name),
+            None => screen.print(0, 0, "[No Name]"),
         }
 
         let info_area_width = buffer.info_area.width as usize - 2;
@@ -104,15 +104,14 @@ impl Screen {
             }
         }
 
-        screen.print(screen.size.height - 1, 0, &format!("{}", buffer.mode));
-
         if let BufferMode::Command = buffer.mode {
             let command_row = screen.size.height - 1;
-            screen.clear_row(command_row);
             screen.print(command_row, 0, &format!(":{}", editor.command.text));
 
             screen.cursor.x = editor.command.cursor_x as u16 + 1;
             screen.cursor.y = command_row;
+        } else {
+            screen.print(screen.size.height - 1, 0, &format!("{}", buffer.mode));
         }
 
         screen
@@ -120,15 +119,7 @@ impl Screen {
 }
 
 impl Screen {
-    pub fn clear_row(&mut self, row: u16) {
-        let columns = self.rows.get_mut(row as usize).unwrap();
-
-        for column in columns.iter_mut() {
-            column.char = ' ';
-        }
-    }
-
-    pub fn print(&mut self, row: u16, column: u16, text: &String) {
+    pub fn print(&mut self, row: u16, column: u16, text: &str) {
         let columns = self.rows.get_mut(row as usize).unwrap();
         let mut column_index = column as usize;
         let mut chars = text.chars();

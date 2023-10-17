@@ -26,7 +26,10 @@ impl<'a> ContentReader<'a> {
 
         if self.is_line_first_char() {
             self.position.y -= 1;
-            self.position.x = self.lines.get(self.position.y).unwrap().len() - 1;
+            self.position.x = self.lines.get(self.position.y).unwrap().len();
+            if self.position.x > 0 {
+                self.position.x -= 1;
+            }
         } else {
             self.position.x -= 1;
         }
@@ -84,12 +87,14 @@ impl<'a> ContentReader<'a> {
 
         if ch.is_whitespace() {
             CharType::Whitespace
-        } else if ch.is_alphanumeric() {
+        } else if ch.is_alphanumeric() || ch == '_' {
             CharType::Word
         } else {
             CharType::Special
         }
     }
+
+    // TODO: Improve this, add move_while_next_char(...
 
     pub fn move_while(&mut self, char_type: CharType, direction: Direction) {
         while self.get_char_type() == char_type {

@@ -71,6 +71,13 @@ pub fn get_default_normal_maps() -> ActionMap {
         buffer.move_cursor(new_position.y, new_position.x);
     });
 
+    map.insert("J", |editor| {
+        let buffer = editor.get_active_buffer_mut();
+        if buffer.cursor.y < buffer.get_row_count() - 1 {
+            buffer.join_lines(buffer.cursor.y, buffer.cursor.y + 1);
+        }
+    });
+
     map.insert("x", |editor| editor.get_active_buffer_mut().delete_char());
 
     map.insert("I", |editor| {

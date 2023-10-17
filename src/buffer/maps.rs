@@ -1,8 +1,6 @@
 use std::collections::HashMap;
 
-use crate::buffer::actions::find_next_word_position::find_next_word_position;
-
-use super::ActionMap;
+use crate::{buffer::ActionMap, motions::motions::get_word_end_position};
 
 pub fn get_default_insert_maps() -> ActionMap {
     let mut map: ActionMap = HashMap::new();
@@ -52,9 +50,9 @@ pub fn get_default_normal_maps() -> ActionMap {
         editor.get_active_buffer_mut().move_last_column()
     });
 
-    map.insert("w", |editor| {
+    map.insert("e", |editor| {
         let buffer = editor.get_active_buffer_mut();
-        let new_position = find_next_word_position(buffer);
+        let new_position = get_word_end_position(buffer);
         buffer.move_cursor(new_position.y, new_position.x);
     });
 

@@ -1,4 +1,3 @@
-pub mod actions;
 pub mod maps;
 pub mod mode;
 pub mod movement;

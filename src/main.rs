@@ -2,6 +2,7 @@ pub mod buffer;
 pub mod commands;
 pub mod core;
 pub mod editor;
+pub mod motions;
 pub mod screen;
 pub mod tab;
 pub mod terminal;

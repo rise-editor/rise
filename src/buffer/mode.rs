@@ -39,6 +39,5 @@ impl Buffer {
 
     pub fn enter_command_mode(&mut self) {
         self.mode = BufferMode::Command;
-        self.command.reset();
     }
 }

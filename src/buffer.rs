@@ -1,5 +1,4 @@
 pub mod actions;
-pub mod command;
 pub mod maps;
 pub mod mode;
 pub mod movement;
@@ -10,8 +9,6 @@ pub mod text;
 
 use std::collections::HashMap;
 
-use crate::core::Rectangle;
-use crate::core::{editable_text::EditableText, Point};
 use crate::{
     buffer::{
         maps::{
@@ -21,6 +18,7 @@ use crate::{
         mode::BufferMode,
         select::Select,
     },
+    core::{Point, Rectangle},
     editor::Editor,
 };
 
@@ -36,7 +34,6 @@ pub struct Buffer {
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
     pub select: Select,
-    pub command: EditableText,
     pub actions_command: ActionMap,
     pub actions_insert: ActionMap,
     pub actions_normal: ActionMap,
@@ -56,10 +53,6 @@ impl Buffer {
             lines: vec![String::new()],
             select: Select {
                 start: Point { x: 0, y: 0 },
-            },
-            command: EditableText {
-                text: String::new(),
-                cursor_x: 0,
             },
             actions_command: get_default_command_maps(),
             actions_insert: get_default_insert_maps(),

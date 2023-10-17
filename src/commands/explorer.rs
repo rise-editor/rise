@@ -1,34 +1,17 @@
 use std::{fs, path::PathBuf};
 
-use crate::buffer::Buffer;
+use crate::{buffer::Buffer, editor::Editor};
 
-fn get_file_list(directory: &String) -> Vec<String> {
-    let paths = fs::read_dir(directory).unwrap();
+pub struct ExplorerCommand {}
 
-    let mut files: Vec<String> = vec![];
-
-    for entry in paths {
-        let path = entry
-            .unwrap()
-            .path()
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
-
-        files.push(path);
+impl ExplorerCommand {
+    pub fn run(editor: &mut Editor) {
+        let mut buffer = editor.get_active_tab_mut().create_new_buffer();
+        initialize_explorer_buffer(&mut buffer, String::from("."));
     }
-
-    files.sort();
-
-    files.insert(0, String::from(".."));
-    files.insert(1, String::from("."));
-
-    files
 }
 
-pub fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
+fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
     let files = get_file_list(&base_path);
 
     buffer.file_name = Some(base_path);
@@ -60,8 +43,8 @@ pub fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
         let md = fs::metadata(&path).unwrap();
 
         if md.is_file() {
-            buffer.command.text = format!("e {}", path);
-            buffer.run_command();
+            editor.command.text = format!("e {}", path);
+            editor.run_command();
         } else if md.is_dir() {
             buffer.file_name = Some(path.clone());
 
@@ -79,4 +62,30 @@ pub fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
     });
 
     buffer.set_size(buffer.area.clone());
+}
+
+fn get_file_list(directory: &String) -> Vec<String> {
+    let paths = fs::read_dir(directory).unwrap();
+
+    let mut files: Vec<String> = vec![];
+
+    for entry in paths {
+        let path = entry
+            .unwrap()
+            .path()
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+
+        files.push(path);
+    }
+
+    files.sort();
+
+    files.insert(0, String::from(".."));
+    files.insert(1, String::from("."));
+
+    files
 }

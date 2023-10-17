@@ -1,6 +1,9 @@
 use crate::{
     buffer::{mode::BufferMode, Buffer},
-    core::{key::Key, Rectangle},
+    commands::{
+        explorer::ExplorerCommand, read_file::ReadFileCommand, write_file::WriteFileCommand,
+    },
+    core::{editable_text::EditableText, key::Key, Rectangle},
     tab::Tab,
 };
 
@@ -11,6 +14,7 @@ pub struct Editor {
     pub status_area: Rectangle<u16>,
     pub tabs: Vec<Tab>,
     pub active_tab: usize,
+    pub command: EditableText,
 }
 
 impl Editor {
@@ -22,6 +26,10 @@ impl Editor {
             status_area: Rectangle::zero(),
             tabs: vec![],
             active_tab: 0,
+            command: EditableText {
+                text: String::new(),
+                cursor_x: 0,
+            },
         };
 
         editor.set_size(area);
@@ -95,10 +103,25 @@ impl Editor {
                 None => {
                     if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                         let ch = key.code.chars().nth(0).unwrap();
-                        buffer.command.insert_char(ch);
+                        self.command.insert_char(ch);
                     }
                 }
             },
         }
+    }
+
+    pub fn run_command(&mut self) {
+        let command = self.command.text.trim();
+
+        if command == "w" || command.starts_with("w ") {
+            WriteFileCommand::run(self);
+        } else if command == "e" {
+            ExplorerCommand::run(self);
+        } else if command.starts_with("e ") {
+            ReadFileCommand::run(self);
+        }
+
+        self.command.reset();
+        self.get_active_buffer_mut().enter_normal_mode();
     }
 }

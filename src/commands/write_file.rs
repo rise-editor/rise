@@ -1,22 +1,24 @@
 use std::fs::File;
 use std::io::Write;
 
-use crate::buffer::Buffer;
+use crate::editor::Editor;
 
 pub struct WriteFileCommand {}
 
 impl WriteFileCommand {
-    pub fn run(buffer: &mut Buffer) {
+    pub fn run(editor: &mut Editor) {
+        let command = editor.command.text.clone();
+        let buffer = editor.get_active_buffer_mut();
         let path;
 
-        if buffer.command.text.trim() == "w" {
+        if command.trim() == "w" {
             if let Some(file_name) = &buffer.file_name {
                 path = file_name.as_str();
             } else {
                 return;
             }
-        } else if buffer.command.text.trim().len() > 2 {
-            path = &buffer.command.text[2..];
+        } else if command.trim().len() > 2 {
+            path = &command[2..];
         } else {
             return;
         }

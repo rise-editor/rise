@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{
-    buffer::actions::find_next_word_position::find_next_word_position,
-    plugins::explorer::explorer_buffer::initialize_explorer_buffer,
-};
+use crate::buffer::actions::find_next_word_position::find_next_word_position;
 
 use super::ActionMap;
 
@@ -106,26 +103,10 @@ pub fn get_default_command_maps() -> ActionMap {
     map.insert("esc", |editor| {
         editor.get_active_buffer_mut().enter_normal_mode()
     });
-    map.insert("enter", |editor| {
-        // TODO: Move this
-        let command = editor.get_active_buffer().command.text.trim();
-        if command == "e" {
-            let tab = editor.get_active_tab_mut();
-            let mut buffer = tab.create_new_buffer();
-            initialize_explorer_buffer(&mut buffer, String::from("."));
-        } else {
-            editor.get_active_buffer_mut().run_command();
-        }
-    });
-    map.insert("backspace", |editor| {
-        editor.get_active_buffer_mut().command.delete_char()
-    });
-    map.insert("left", |editor| {
-        editor.get_active_buffer_mut().command.move_left()
-    });
-    map.insert("right", |editor| {
-        editor.get_active_buffer_mut().command.move_right()
-    });
+    map.insert("enter", |editor| editor.run_command());
+    map.insert("backspace", |editor| editor.command.delete_char());
+    map.insert("left", |editor| editor.command.move_left());
+    map.insert("right", |editor| editor.command.move_right());
     return map;
 }
 

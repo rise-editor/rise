@@ -109,9 +109,9 @@ impl Screen {
         if let BufferMode::Command = buffer.mode {
             let command_row = screen.size.height - 1;
             screen.clear_row(command_row);
-            screen.print(command_row, 0, &format!(":{}", buffer.command.text));
+            screen.print(command_row, 0, &format!(":{}", editor.command.text));
 
-            screen.cursor.x = buffer.command.cursor_x as u16 + 1;
+            screen.cursor.x = editor.command.cursor_x as u16 + 1;
             screen.cursor.y = command_row;
         }
 

@@ -3,24 +3,25 @@ use crate::{
     core::{Point, Size},
     editor::Editor,
     terminal::CursorStyle,
+    theme::{Color, THEME_ONE as T, WHITE},
 };
 
 #[derive(Clone, Eq, PartialEq)]
 pub struct Cell {
     pub char: char,
-    pub color: (u8, u8, u8),
-    pub background_color: (u8, u8, u8),
+    pub color: Color,
+    pub background_color: Color,
     pub bold: bool,
     pub underline: bool,
     pub italic: bool,
 }
 
 impl Cell {
-    pub fn new() -> Self {
+    pub fn new(fg: Color, bg: Color) -> Self {
         Self {
             char: ' ',
-            color: (255, 255, 255),
-            background_color: (0, 0, 0),
+            color: fg,
+            background_color: bg,
             bold: false,
             underline: false,
             italic: false,
@@ -51,7 +52,7 @@ impl Screen {
             let mut row: Vec<Cell> = vec![];
 
             for _ in 0..screen.size.width {
-                row.push(Cell::new());
+                row.push(Cell::new(WHITE, T.bg));
             }
 
             screen.rows.push(row);
@@ -62,6 +63,9 @@ impl Screen {
 
     pub fn from(editor: &Editor) -> Self {
         let mut screen = Screen::new(editor.area.height, editor.area.width);
+
+        let width = screen.size.width;
+        let height = screen.size.height;
 
         let tab = editor.get_active_tab();
         let buffer = tab.get_active_buffer();
@@ -74,13 +78,29 @@ impl Screen {
             BufferMode::Insert => screen.cursor_style = CursorStyle::BlinkingBar,
             BufferMode::Command => screen.cursor_style = CursorStyle::BlinkingBar,
         }
+        screen.paint_range(
+            Point { y: 0, x: 0 },
+            Point { y: 0, x: width - 1 },
+            WHITE,
+            T.tab_line_bg,
+        );
+        screen.paint_range(
+            Point {
+                y: height - 1,
+                x: 0,
+            },
+            Point {
+                y: height - 1,
+                x: width - 1,
+            },
+            WHITE,
+            T.status_line_bg,
+        );
 
         match &buffer.file_name {
-            Some(name) => screen.print(0, 0, &name),
-            None => screen.print(0, 0, "[No Name]"),
+            Some(name) => screen.print(0, 0, &name, T.tab_selected_fg, T.tab_selected_bg),
+            None => screen.print(0, 0, "[No Name]", T.tab_selected_fg, T.tab_selected_bg),
         }
-
-        let info_area_width = buffer.info_area.width as usize - 2;
 
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
@@ -88,22 +108,80 @@ impl Screen {
                 Some(text) => {
                     screen.print(
                         y + 1,
-                        0,
-                        &format!(" {:>2$} {}", row_index + 1, text, info_area_width),
+                        buffer.area.x,
+                        &format!(
+                            " {:>1$} ",
+                            row_index + 1,
+                            buffer.info_area.width as usize - 2
+                        ),
+                        T.info_column_fg,
+                        T.info_column_bg,
+                    );
+                    screen.print(
+                        y + 1,
+                        buffer.area.x + buffer.info_area.width,
+                        &text,
+                        T.text_fg,
+                        T.text_bg,
                     );
                 }
-                None => screen.print(y + 1, 0, &format!("~")),
+                None => screen.print(y + 1, 0, "~", T.info_column_fg, T.bg),
             }
+        }
+
+        match buffer.mode {
+            BufferMode::Normal => {
+                screen.print(
+                    screen.size.height - 1,
+                    0,
+                    &format!("{}", buffer.mode),
+                    T.status_normal_mode_fg,
+                    T.status_normal_mode_bg,
+                );
+            }
+            BufferMode::Insert => {
+                screen.print(
+                    screen.size.height - 1,
+                    0,
+                    &format!("{}", buffer.mode),
+                    T.status_insert_mode_fg,
+                    T.status_insert_mode_bg,
+                );
+            }
+            BufferMode::Visual => {
+                screen.print(
+                    screen.size.height - 1,
+                    0,
+                    &format!("{}", buffer.mode),
+                    T.status_visual_mode_fg,
+                    T.status_visual_mode_bg,
+                );
+                // TODO: Move calculation and improve
+                let pos_start = Point {
+                    x: buffer.text_area.x + (buffer.select.start.x - buffer.scroll.x) as u16,
+                    y: buffer.text_area.y + (buffer.select.start.y - buffer.scroll.y) as u16,
+                };
+                let pos_end = Point {
+                    x: buffer.text_area.x + (buffer.cursor.x - buffer.scroll.x) as u16,
+                    y: buffer.text_area.y + (buffer.cursor.y - buffer.scroll.y) as u16,
+                };
+                screen.paint_range(pos_start, pos_end, T.text_selected_fg, T.text_selected_bg);
+            }
+            _ => {}
         }
 
         if let BufferMode::Command = buffer.mode {
             let command_row = screen.size.height - 1;
-            screen.print(command_row, 0, &format!(":{}", editor.command.text));
+            screen.print(
+                command_row,
+                0,
+                &format!(":{}", editor.command.text),
+                WHITE,
+                T.status_line_bg,
+            );
 
             screen.cursor.x = editor.command.cursor_x as u16 + 1;
             screen.cursor.y = command_row;
-        } else {
-            screen.print(screen.size.height - 1, 0, &format!("{}", buffer.mode));
         }
 
         screen
@@ -121,14 +199,47 @@ impl Screen {
 }
 
 impl Screen {
-    pub fn print(&mut self, row: u16, column: u16, text: &str) {
+    pub fn print(&mut self, row: u16, column: u16, text: &str, fg: Color, bg: Color) {
         let columns = self.rows.get_mut(row as usize).unwrap();
         let mut column_index = column as usize;
         let mut chars = text.chars();
 
         while let Some(c) = chars.next() {
-            columns.get_mut(column_index).unwrap().char = c;
+            let cell = columns.get_mut(column_index).unwrap();
+            cell.char = c;
+            cell.color = fg;
+            cell.background_color = bg;
             column_index += 1;
+        }
+    }
+
+    pub fn paint_range(
+        &mut self,
+        position_start: Point<u16>,
+        position_end: Point<u16>,
+        fg: Color,
+        bg: Color,
+    ) {
+        for row in position_start.y..(position_end.y + 1) {
+            let column_start = if row == position_start.y {
+                position_start.x
+            } else {
+                0
+            };
+
+            let column_end = if row == position_end.y {
+                position_end.x
+            } else {
+                self.size.width - 1
+            };
+
+            let columns = self.rows.get_mut(row as usize).unwrap();
+
+            for column in column_start..(column_end + 1) {
+                let cell = columns.get_mut(column as usize).unwrap();
+                cell.color = fg;
+                cell.background_color = bg;
+            }
         }
     }
 }

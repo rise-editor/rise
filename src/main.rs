@@ -6,6 +6,7 @@ pub mod motions;
 pub mod screen;
 pub mod tab;
 pub mod terminal;
+pub mod theme;
 
 use std::io::Result;
 

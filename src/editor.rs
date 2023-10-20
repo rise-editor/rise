@@ -61,6 +61,24 @@ impl Editor {
         self.get_active_tab_mut().get_active_buffer_mut()
     }
 
+    pub fn get_active_buffer_or_popup(&self) -> &Buffer {
+        let buffer = self.get_active_tab().get_active_buffer();
+
+        match buffer.active_popup {
+            Some(i) => buffer.popups.get(i).unwrap(),
+            None => buffer,
+        }
+    }
+
+    pub fn get_active_buffer_or_popup_mut(&mut self) -> &mut Buffer {
+        let buffer = self.get_active_tab_mut().get_active_buffer_mut();
+
+        match buffer.active_popup {
+            Some(i) => buffer.popups.get_mut(i).unwrap(),
+            None => buffer,
+        }
+    }
+
     pub fn set_size(&mut self, area: Rectangle<u16>) {
         self.area = area.clone();
         self.tabs_area = area.clone();
@@ -78,7 +96,11 @@ impl Editor {
     }
 
     pub fn handle_key(&mut self, key: Key) {
-        let buffer = self.get_active_buffer_mut();
+        let main_buffer = self.get_active_buffer_mut();
+        let buffer = match main_buffer.active_popup {
+            Some(active_popup_index) => main_buffer.popups.get_mut(active_popup_index).unwrap(),
+            None => main_buffer,
+        };
 
         match buffer.mode {
             BufferMode::Normal => match buffer.actions_normal.get(&key.to_string().as_str()) {
@@ -94,7 +116,7 @@ impl Editor {
                 None => {
                     if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                         let ch = key.code.chars().nth(0).unwrap();
-                        self.get_active_buffer_mut().insert_char(ch);
+                        buffer.insert_char(ch);
                     }
                 }
             },
@@ -103,7 +125,7 @@ impl Editor {
                 None => {
                     if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                         let ch = key.code.chars().nth(0).unwrap();
-                        self.command.insert_char(ch);
+                        buffer.insert_char(ch);
                     }
                 }
             },

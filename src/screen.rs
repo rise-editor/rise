@@ -1,5 +1,5 @@
 use crate::{
-    buffer::mode::BufferMode,
+    buffer::{mode::BufferMode, Buffer},
     core::{Point, Size},
     editor::Editor,
     terminal::CursorStyle,
@@ -67,17 +67,18 @@ impl Screen {
         let width = screen.size.width;
         let height = screen.size.height;
 
-        let tab = editor.get_active_tab();
-        let buffer = tab.get_active_buffer();
+        screen.cursor = editor.get_active_buffer_or_popup().get_cursor_screen_pos();
 
-        screen.cursor = buffer.get_cursor_screen_pos();
-
-        match buffer.mode {
+        match editor.get_active_buffer_or_popup().mode {
             BufferMode::Normal => screen.cursor_style = CursorStyle::BlinkingBlock,
             BufferMode::Visual => screen.cursor_style = CursorStyle::BlinkingBlock,
             BufferMode::Insert => screen.cursor_style = CursorStyle::BlinkingBar,
             BufferMode::Command => screen.cursor_style = CursorStyle::BlinkingBar,
         }
+
+        let tab = editor.get_active_tab();
+        let buffer = tab.get_active_buffer();
+
         screen.paint_range(
             Point { y: 0, x: 0 },
             Point { y: 0, x: width - 1 },
@@ -102,31 +103,10 @@ impl Screen {
             None => screen.print(0, 0, "[No Name]", T.tab_selected_fg, T.tab_selected_bg),
         }
 
-        for y in 0..buffer.area.height {
-            let row_index = buffer.scroll.y + y as usize;
-            match buffer.get_line_visible_text(row_index) {
-                Some(text) => {
-                    screen.print(
-                        y + 1,
-                        buffer.area.x,
-                        &format!(
-                            " {:>1$} ",
-                            row_index + 1,
-                            buffer.info_area.width as usize - 2
-                        ),
-                        T.info_column_fg,
-                        T.info_column_bg,
-                    );
-                    screen.print(
-                        y + 1,
-                        buffer.area.x + buffer.info_area.width,
-                        &text,
-                        T.text_fg,
-                        T.text_bg,
-                    );
-                }
-                None => screen.print(y + 1, 0, "~", T.info_column_fg, T.bg),
-            }
+        screen.print_buffer(&buffer);
+
+        for popup in buffer.popups.iter() {
+            screen.print_buffer(popup);
         }
 
         match buffer.mode {
@@ -195,6 +175,41 @@ impl Screen {
         }
 
         None
+    }
+
+    pub fn print_buffer(&mut self, buffer: &Buffer) {
+        for y in 0..buffer.area.height {
+            let row_index = buffer.scroll.y + y as usize;
+            match buffer.get_line_visible_text(row_index) {
+                Some(text) => {
+                    self.print(
+                        buffer.area.y + y,
+                        buffer.area.x,
+                        &format!(
+                            " {:>1$} ",
+                            row_index + 1,
+                            buffer.info_area.width as usize - 2
+                        ),
+                        T.info_column_fg,
+                        T.info_column_bg,
+                    );
+                    self.print(
+                        buffer.area.y + y,
+                        buffer.area.x + buffer.info_area.width,
+                        &text,
+                        T.text_fg,
+                        T.text_bg,
+                    );
+                }
+                None => self.print(
+                    buffer.area.y + y,
+                    buffer.area.x,
+                    "~",
+                    T.info_column_fg,
+                    T.bg,
+                ),
+            }
+        }
     }
 }
 

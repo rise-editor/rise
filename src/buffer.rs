@@ -37,6 +37,8 @@ pub struct Buffer {
     pub actions_insert: ActionMap,
     pub actions_normal: ActionMap,
     pub actions_visual: ActionMap,
+    pub popups: Vec<Buffer>,
+    pub active_popup: Option<usize>,
 }
 
 impl Buffer {
@@ -57,6 +59,8 @@ impl Buffer {
             actions_insert: get_default_insert_maps(),
             actions_normal: get_default_normal_maps(),
             actions_visual: get_default_visual_maps(),
+            popups: vec![],
+            active_popup: None,
         };
 
         buffer.set_size(area);

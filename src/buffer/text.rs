@@ -64,5 +64,6 @@ impl Buffer {
     pub fn set_content(&mut self, content: String) {
         self.lines = content.split('\n').map(|x| String::from(x)).collect();
         self.move_cursor(0, 0);
+        self.set_size(self.area.clone());
     }
 }

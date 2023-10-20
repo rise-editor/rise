@@ -125,7 +125,7 @@ impl Editor {
                 None => {
                     if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                         let ch = key.code.chars().nth(0).unwrap();
-                        buffer.insert_char(ch);
+                        self.command.insert_char(ch);
                     }
                 }
             },

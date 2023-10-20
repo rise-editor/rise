@@ -128,6 +128,7 @@ pub fn get_default_normal_maps() -> ActionMap {
         buffer.enter_insert_mode();
     });
     map.insert(":", |editor| {
+        editor.command.reset();
         editor.get_active_buffer_or_popup_mut().enter_command_mode()
     });
     map.insert("v", |editor| {

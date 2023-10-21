@@ -23,6 +23,9 @@ pub struct Theme {
     pub status_insert_mode_bg: Color,
     pub status_visual_mode_fg: Color,
     pub status_visual_mode_bg: Color,
+
+    pub border_color_fg: Color,
+    pub border_color_bg: Color,
 }
 
 pub const BLACK: Color = (0, 0, 0);
@@ -38,7 +41,7 @@ pub const THEME_ONE: Theme = Theme {
     tab_line_bg: GRAY,
     tab_fg: WHITE,
     tab_bg: GRAY,
-    tab_selected_fg: WHITE,
+    tab_selected_fg: BLACK,
     tab_selected_bg: SILVER,
 
     info_column_fg: BLACK,
@@ -57,4 +60,7 @@ pub const THEME_ONE: Theme = Theme {
     status_insert_mode_bg: BLUE,
     status_visual_mode_fg: WHITE,
     status_visual_mode_bg: PURPLE,
+
+    border_color_fg: BLACK,
+    border_color_bg: SILVER,
 };

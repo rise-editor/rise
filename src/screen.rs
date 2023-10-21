@@ -187,22 +187,30 @@ impl Screen {
                     .cell_mut(buffer.area.y - 1, buffer.area.x + column)
                     .unwrap();
                 cell_top.char = '-';
+                cell_top.color = T.border_color_fg;
+                cell_top.background_color = T.border_color_bg;
 
                 let cell_bottom = self
                     .cell_mut(buffer.area.y + buffer.area.height, buffer.area.x + column)
                     .unwrap();
                 cell_bottom.char = '-';
+                cell_bottom.color = T.border_color_fg;
+                cell_bottom.background_color = T.border_color_bg;
             }
             for row in 0..buffer.area.height {
                 let cell_left = self
                     .cell_mut(buffer.area.y + row, buffer.area.x - 1)
                     .unwrap();
                 cell_left.char = '|';
+                cell_left.color = T.border_color_fg;
+                cell_left.background_color = T.border_color_bg;
 
                 let cell_right = self
                     .cell_mut(buffer.area.y + row, buffer.area.x + buffer.area.width)
                     .unwrap();
                 cell_right.char = '|';
+                cell_right.color = T.border_color_fg;
+                cell_right.background_color = T.border_color_bg;
             }
         }
 

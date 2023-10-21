@@ -11,11 +11,11 @@ impl FindFileCommand {
             x: 10,
             y: 10,
             width: buffer.area.width - 20,
-            height: buffer.area.height - 22,
+            height: buffer.area.height - 20,
         });
         let mut textbox_popup = Buffer::new(Rectangle {
             x: files_popup.area.x,
-            y: files_popup.area.y + files_popup.area.height + 2,
+            y: files_popup.area.y + files_popup.area.height + 1,
             width: files_popup.area.width,
             height: 1,
         });

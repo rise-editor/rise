@@ -2,6 +2,7 @@ pub mod maps;
 pub mod mode;
 pub mod movement;
 pub mod operations;
+pub mod options;
 pub mod paint;
 pub mod select;
 pub mod text;
@@ -15,6 +16,7 @@ use crate::{
             get_default_visual_maps,
         },
         mode::BufferMode,
+        options::BufferOptions,
         select::Select,
     },
     core::{Point, Rectangle},
@@ -39,6 +41,7 @@ pub struct Buffer {
     pub actions_visual: ActionMap,
     pub popups: Vec<Buffer>,
     pub active_popup: Option<usize>,
+    pub options: BufferOptions,
 }
 
 impl Buffer {
@@ -61,6 +64,7 @@ impl Buffer {
             actions_visual: get_default_visual_maps(),
             popups: vec![],
             active_popup: None,
+            options: BufferOptions::default(),
         };
 
         buffer.set_size(area);
@@ -71,6 +75,9 @@ impl Buffer {
         self.info_area = area.clone();
         self.text_area = area.clone();
         self.info_area.width = 2 + self.lines.len().to_string().len() as u16;
+        if !self.options.show_info_column {
+            self.info_area.width = 0;
+        }
         self.text_area.x = self.info_area.x + self.info_area.width;
         self.text_area.width = area.width - self.info_area.width;
         self.move_cursor(self.cursor.y, self.cursor.x);

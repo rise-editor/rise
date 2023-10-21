@@ -7,18 +7,25 @@ pub struct FindFileCommand {}
 impl FindFileCommand {
     pub fn run(editor: &mut Editor) {
         let buffer = editor.get_active_buffer_mut();
-        let files_popup = Buffer::new(Rectangle {
+        let mut files_popup = Buffer::new(Rectangle {
             x: 10,
             y: 10,
             width: buffer.area.width - 20,
-            height: buffer.area.height - 20,
+            height: buffer.area.height - 21,
         });
+        files_popup.options.show_border = true;
+        files_popup.options.show_info_column = false;
+        files_popup.set_size(files_popup.area.clone()); // TODO: Move
+
         let mut textbox_popup = Buffer::new(Rectangle {
             x: files_popup.area.x,
-            y: files_popup.area.y + files_popup.area.height + 1,
+            y: files_popup.area.y + files_popup.area.height + 2,
             width: files_popup.area.width,
             height: 1,
         });
+        textbox_popup.options.show_border = true;
+        textbox_popup.options.show_info_column = false;
+        textbox_popup.set_size(textbox_popup.area.clone()); // TODO: Move
 
         textbox_popup.actions_insert.insert("<c-p>", |editor| {
             let buffer = editor.get_active_buffer_mut();

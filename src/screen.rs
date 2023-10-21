@@ -168,24 +168,61 @@ impl Screen {
         None
     }
 
+    pub fn cell_mut(&mut self, row: u16, column: u16) -> Option<&mut Cell> {
+        if let Some(cells) = self.rows.get_mut(row as usize) {
+            if let Some(cell) = cells.get_mut(column as usize) {
+                return Some(cell);
+            }
+        }
+
+        None
+    }
+
     pub fn print_buffer(&mut self, buffer: &Buffer) {
         self.clear_square(buffer.area.clone());
+
+        if buffer.options.show_border {
+            for column in 0..buffer.area.width {
+                let cell_top = self
+                    .cell_mut(buffer.area.y - 1, buffer.area.x + column)
+                    .unwrap();
+                cell_top.char = '-';
+
+                let cell_bottom = self
+                    .cell_mut(buffer.area.y + buffer.area.height, buffer.area.x + column)
+                    .unwrap();
+                cell_bottom.char = '-';
+            }
+            for row in 0..buffer.area.height {
+                let cell_left = self
+                    .cell_mut(buffer.area.y + row, buffer.area.x - 1)
+                    .unwrap();
+                cell_left.char = '|';
+
+                let cell_right = self
+                    .cell_mut(buffer.area.y + row, buffer.area.x + buffer.area.width)
+                    .unwrap();
+                cell_right.char = '|';
+            }
+        }
 
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
             match buffer.get_line_visible_text(row_index) {
                 Some(text) => {
-                    self.print(
-                        buffer.area.y + y,
-                        buffer.area.x,
-                        &format!(
-                            " {:>1$} ",
-                            row_index + 1,
-                            buffer.info_area.width as usize - 2
-                        ),
-                        T.info_column_fg,
-                        T.info_column_bg,
-                    );
+                    if buffer.options.show_info_column {
+                        self.print(
+                            buffer.area.y + y,
+                            buffer.area.x,
+                            &format!(
+                                " {:>1$} ",
+                                row_index + 1,
+                                buffer.info_area.width as usize - 2
+                            ),
+                            T.info_column_fg,
+                            T.info_column_bg,
+                        );
+                    }
                     self.print(
                         buffer.area.y + y,
                         buffer.area.x + buffer.info_area.width,
@@ -194,13 +231,17 @@ impl Screen {
                         T.text_bg,
                     );
                 }
-                None => self.print(
-                    buffer.area.y + y,
-                    buffer.area.x,
-                    "~",
-                    T.info_column_fg,
-                    T.bg,
-                ),
+                None => {
+                    if buffer.options.show_info_column {
+                        self.print(
+                            buffer.area.y + y,
+                            buffer.area.x,
+                            "~",
+                            T.info_column_fg,
+                            T.bg,
+                        );
+                    }
+                }
             }
         }
     }

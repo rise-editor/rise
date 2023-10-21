@@ -1,7 +1,8 @@
 use crate::{
     buffer::{mode::BufferMode, Buffer},
     commands::{
-        explorer::ExplorerCommand, read_file::ReadFileCommand, write_file::WriteFileCommand,
+        explorer::ExplorerCommand, find_file::FindFileCommand, read_file::ReadFileCommand,
+        write_file::WriteFileCommand,
     },
     core::{editable_text::EditableText, key::Key, Rectangle},
     tab::Tab,
@@ -141,6 +142,8 @@ impl Editor {
             ExplorerCommand::run(self);
         } else if command.starts_with("e ") {
             ReadFileCommand::run(self);
+        } else if command == "f" {
+            FindFileCommand::run(self);
         }
 
         self.command.reset();

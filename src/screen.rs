@@ -69,6 +69,8 @@ impl Screen {
 
         screen.cursor = editor.get_active_buffer_or_popup().get_cursor_screen_pos();
 
+        screen.print_tabs(editor);
+
         match editor.get_active_buffer_or_popup().mode {
             BufferMode::Normal => screen.cursor_style = CursorStyle::BlinkingBlock,
             BufferMode::Visual => screen.cursor_style = CursorStyle::BlinkingBlock,
@@ -79,12 +81,6 @@ impl Screen {
         let tab = editor.get_active_tab();
         let buffer = tab.get_active_buffer();
 
-        screen.paint_range(
-            Point { y: 0, x: 0 },
-            Point { y: 0, x: width - 1 },
-            WHITE,
-            T.tab_line_bg,
-        );
         screen.paint_range(
             Point {
                 y: height - 1,
@@ -97,11 +93,6 @@ impl Screen {
             WHITE,
             T.status_line_bg,
         );
-
-        match &buffer.file_name {
-            Some(name) => screen.print(0, 0, &name, T.tab_selected_fg, T.tab_selected_bg),
-            None => screen.print(0, 0, "[No Name]", T.tab_selected_fg, T.tab_selected_bg),
-        }
 
         screen.print_buffer(&buffer);
 
@@ -273,6 +264,41 @@ impl Screen {
                 cell.background_color = T.bg;
                 cell.char = ' ';
             }
+        }
+    }
+
+    pub fn print_tabs(&mut self, editor: &Editor) {
+        self.paint_range(
+            Point { y: 0, x: 0 },
+            Point {
+                y: 0,
+                x: self.size.width - 1,
+            },
+            WHITE,
+            T.tab_line_bg,
+        );
+
+        let row = editor.tabs_area.y;
+        let mut column: u16 = 0;
+
+        for tab_index in 0..editor.tabs.len() {
+            let tab = editor.tabs.get(tab_index).unwrap();
+            let buffer = tab.get_active_buffer();
+
+            let (fg, bg) = if editor.active_tab == tab_index {
+                (T.tab_selected_fg, T.tab_selected_bg)
+            } else {
+                (T.tab_fg, T.tab_bg)
+            };
+
+            let text = match &buffer.file_name {
+                Some(name) => &name,
+                None => "[No Name]",
+            };
+
+            self.print(row, column, format!(" {} ", text).as_str(), fg, bg);
+
+            column += text.len() as u16 + 2;
         }
     }
 }

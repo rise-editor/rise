@@ -37,8 +37,8 @@ pub const GREEN: Color = (0, 100, 0);
 pub const THEME_ONE: Theme = Theme {
     tab_line_bg: GRAY,
     tab_fg: WHITE,
-    tab_bg: SILVER,
-    tab_selected_fg: BLACK,
+    tab_bg: GRAY,
+    tab_selected_fg: WHITE,
     tab_selected_bg: SILVER,
 
     info_column_fg: BLACK,

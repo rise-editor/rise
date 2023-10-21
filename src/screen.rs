@@ -1,6 +1,6 @@
 use crate::{
     buffer::{mode::BufferMode, Buffer},
-    core::{Point, Size},
+    core::{Point, Rectangle, Size},
     editor::Editor,
     terminal::CursorStyle,
     theme::{Color, THEME_ONE as T, WHITE},
@@ -178,6 +178,8 @@ impl Screen {
     }
 
     pub fn print_buffer(&mut self, buffer: &Buffer) {
+        self.clear_square(buffer.area.clone());
+
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
             match buffer.get_line_visible_text(row_index) {
@@ -254,6 +256,22 @@ impl Screen {
                 let cell = columns.get_mut(column as usize).unwrap();
                 cell.color = fg;
                 cell.background_color = bg;
+            }
+        }
+    }
+
+    pub fn clear_square(&mut self, area: Rectangle<u16>) {
+        for row in 0..area.height {
+            for column in 0..area.width {
+                let cell = self
+                    .rows
+                    .get_mut((area.y + row) as usize)
+                    .unwrap()
+                    .get_mut((area.x + column) as usize)
+                    .unwrap();
+
+                cell.background_color = T.bg;
+                cell.char = ' ';
             }
         }
     }

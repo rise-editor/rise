@@ -1,7 +1,7 @@
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::Read;
 
-use crate::editor::Editor;
+use crate::{commands::explorer::ExplorerCommand, editor::Editor};
 
 pub struct ReadFileCommand {}
 
@@ -19,8 +19,13 @@ impl ReadFileCommand {
         }
         let mut content = String::new();
         let file_path = buffer.file_name.as_ref().unwrap();
-        let mut file = File::open(file_path).unwrap();
-        file.read_to_string(&mut content).unwrap();
-        buffer.set_content(content);
+        if fs::metadata(&file_path).unwrap().is_dir() {
+            let path = file_path.clone();
+            ExplorerCommand::run(editor, &path);
+        } else {
+            let mut file = File::open(file_path).unwrap();
+            file.read_to_string(&mut content).unwrap();
+            buffer.set_content(content);
+        }
     }
 }

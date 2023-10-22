@@ -1,24 +1,55 @@
 use std::{fs, path::PathBuf};
 
-use crate::{buffer::Buffer, editor::Editor};
+use crate::{
+    buffer::{highlight::Highlight, Buffer},
+    core::Style,
+    editor::Editor,
+    theme::{GREEN, SILVER},
+};
 
 pub struct ExplorerCommand {}
 
 impl ExplorerCommand {
-    pub fn run(editor: &mut Editor) {
+    pub fn run(editor: &mut Editor, path: &str) {
         let mut buffer = editor.get_active_tab_mut().create_new_buffer();
-        initialize_explorer_buffer(&mut buffer, String::from("."));
+        initialize_explorer_buffer(&mut buffer, path);
     }
 }
 
-fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
-    let files = get_file_list(&base_path);
+const FOLDER_STYLE: &str = "ExplorerFolder";
 
-    buffer.file_name = Some(base_path);
+fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: &str) {
+    buffer.styles.insert(
+        FOLDER_STYLE,
+        Style {
+            fg: GREEN,
+            bg: SILVER,
+            bold: false,
+            italic: false,
+            underline: false,
+        },
+    );
 
+    let files = get_file_list(base_path);
+
+    buffer.file_name = Some(base_path.to_owned());
     buffer.lines.clear();
-    for file in files {
-        buffer.lines.push(file);
+    buffer.highlights.clear();
+
+    for (i, file) in files.iter().enumerate() {
+        let mut file_path = PathBuf::from(base_path);
+        file_path.push(file);
+
+        if file != "." && file != ".." && fs::metadata(file_path).unwrap().is_dir() {
+            buffer.highlights.push(Highlight {
+                name: FOLDER_STYLE,
+                row: i,
+                start: 0,
+                end: file.len() - 1,
+            });
+        }
+
+        buffer.lines.push(file.to_owned());
     }
 
     buffer.actions_normal.insert("enter", |editor| {
@@ -40,31 +71,14 @@ fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: String) {
             path = String::from(".");
         }
 
-        let md = fs::metadata(&path).unwrap();
-
-        if md.is_file() {
-            editor.command.text = format!("e {}", path);
-            editor.run_command();
-        } else if md.is_dir() {
-            buffer.file_name = Some(path.clone());
-
-            let files = get_file_list(&path);
-
-            buffer.lines.clear();
-
-            for file in files {
-                buffer.lines.push(file);
-            }
-
-            buffer.move_cursor(0, 0);
-            buffer.set_size(buffer.area.clone());
-        }
+        editor.command.text = format!("e {}", path);
+        editor.run_command();
     });
 
     buffer.set_size(buffer.area.clone());
 }
 
-fn get_file_list(directory: &String) -> Vec<String> {
+fn get_file_list(directory: &str) -> Vec<String> {
     let paths = fs::read_dir(directory).unwrap();
 
     let mut files: Vec<String> = vec![];

@@ -139,7 +139,7 @@ impl Editor {
         if command == "w" || command.starts_with("w ") {
             WriteFileCommand::run(self);
         } else if command == "e" {
-            ExplorerCommand::run(self);
+            ExplorerCommand::run(self, ".");
         } else if command.starts_with("e ") {
             ReadFileCommand::run(self);
         } else if command == "f" {

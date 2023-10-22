@@ -53,6 +53,18 @@ impl Buffer {
         self.get_current_line().len()
     }
 
+    pub fn get_line_last_char_index(&self, row: usize) -> Option<usize> {
+        let line = self.lines.get(row)?;
+        match line.len() {
+            0 => None,
+            length => Some(length - 1),
+        }
+    }
+
+    pub fn get_current_line_last_char_index(&self) -> Option<usize> {
+        self.get_line_last_char_index(self.cursor.y)
+    }
+
     pub fn get_row_count(&self) -> usize {
         self.lines.len()
     }

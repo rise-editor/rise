@@ -21,28 +21,20 @@ impl Buffer {
         let mut list: Vec<Highlight> = vec![];
 
         list.push(Highlight {
-            name: "SelectedLine",
+            name: "CurrentLine",
             row: self.cursor.x,
             start: self.scroll.x,
             end: self.text_area.width as usize,
         });
 
-        if self.lines.len() == 0 {
-            panic!("I have no lines");
+        if let Some(end) = self.get_current_line_last_char_index() {
+            list.push(Highlight {
+                name: "CurrentLineText",
+                row: self.cursor.y,
+                start: 0,
+                end,
+            });
         }
-
-        let mut end = self.get_line(self.cursor.y).len();
-
-        if end > 0 {
-            end -= 1;
-        }
-
-        list.push(Highlight {
-            name: "SelectedLineText",
-            row: self.cursor.y,
-            start: 0,
-            end,
-        });
 
         list
     }

@@ -22,7 +22,7 @@ impl FindFileCommand {
         files_popup.options.show_info_column = false;
         files_popup.set_size(files_popup.area.clone()); // TODO: Move
         files_popup.styles.insert(
-            "SelectedLineText",
+            "CurrentLineText",
             Style {
                 fg: (88, 129, 87),
                 bg: SILVER,

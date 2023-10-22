@@ -140,10 +140,6 @@ impl Terminal {
         crossterm::queue!(&self.stdout, cursor::MoveTo(column, row))
     }
 
-    pub fn clear(&mut self) -> Result<()> {
-        crossterm::queue!(&self.stdout, terminal::Clear(terminal::ClearType::All))
-    }
-
     pub fn flush(&mut self) -> Result<()> {
         self.stdout.flush()
     }

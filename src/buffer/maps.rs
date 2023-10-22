@@ -89,7 +89,7 @@ pub fn get_default_normal_maps() -> ActionMap {
 
     map.insert("J", |editor| {
         let buffer = editor.get_active_buffer_or_popup_mut();
-        if buffer.cursor.y < buffer.get_row_count() - 1 {
+        if buffer.cursor.y < buffer.get_line_count() - 1 {
             buffer.join_lines(buffer.cursor.y, buffer.cursor.y + 1);
         }
     });

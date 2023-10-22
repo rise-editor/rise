@@ -1,7 +1,7 @@
 use crate::buffer::{Buffer, BufferMode};
 use crate::core::Point;
 
-pub struct Select {
+pub struct Selection {
     pub start: Point<usize>,
 }
 
@@ -10,9 +10,9 @@ impl Buffer {
         if let BufferMode::Visual = self.mode {
             let x = self.cursor.x;
             let y = self.cursor.y;
-            self.move_cursor(self.select.start.y, self.select.start.x);
-            self.select.start.x = x;
-            self.select.start.y = y;
+            self.move_cursor(self.selection.start.y, self.selection.start.x);
+            self.selection.start.x = x;
+            self.selection.start.y = y;
         }
     }
 }

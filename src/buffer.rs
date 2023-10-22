@@ -1,3 +1,4 @@
+pub mod helper;
 pub mod highlight;
 pub mod maps;
 pub mod mode;
@@ -5,8 +6,8 @@ pub mod movement;
 pub mod operations;
 pub mod options;
 pub mod paint;
-pub mod select;
 pub mod text;
+pub mod visual_mode;
 
 use std::collections::HashMap;
 
@@ -19,7 +20,7 @@ use crate::{
         },
         mode::BufferMode,
         options::BufferOptions,
-        select::Select,
+        visual_mode::Selection,
     },
     core::{Point, Rectangle, Style},
     editor::Editor,
@@ -36,7 +37,7 @@ pub struct Buffer {
     pub scroll: Point<usize>,
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
-    pub select: Select,
+    pub selection: Selection,
     pub actions_command: ActionMap,
     pub actions_insert: ActionMap,
     pub actions_normal: ActionMap,
@@ -59,7 +60,7 @@ impl Buffer {
             scroll: Point { x: 0, y: 0 },
             cursor: Point { x: 0, y: 0 },
             lines: vec![String::new()],
-            select: Select {
+            selection: Selection {
                 start: Point { x: 0, y: 0 },
             },
             actions_command: get_default_command_maps(),
@@ -81,7 +82,7 @@ impl Buffer {
         self.area = area.clone();
         self.info_area = area.clone();
         self.text_area = area.clone();
-        self.info_area.width = 2 + self.lines.len().to_string().len() as u16;
+        self.info_area.width = 2 + self.get_line_count().to_string().len() as u16;
         if !self.options.show_info_column {
             self.info_area.width = 0;
         }

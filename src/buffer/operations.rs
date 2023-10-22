@@ -21,7 +21,7 @@ impl Buffer {
         if line.len() == 0 {
             return;
         } else if line.len() == column {
-            if row + 1 < self.get_row_count() {
+            if row + 1 < self.get_line_count() {
                 self.join_lines(row, row + 1);
             }
         } else {
@@ -72,12 +72,5 @@ impl Buffer {
         line1.push_str(&line2);
         self.lines.remove(row2);
         self.set_size(self.area.clone());
-    }
-}
-
-#[cfg(test)]
-pub mod tests {
-    #[test]
-    pub fn join_lines_test() {
     }
 }

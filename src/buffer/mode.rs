@@ -1,19 +1,11 @@
-use std::fmt::{Display, Formatter, Result};
-
 use super::Buffer;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum BufferMode {
     Normal,
     Insert,
     Visual,
     Command,
-}
-
-impl Display for BufferMode {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{:?}", self)
-    }
 }
 
 impl Buffer {
@@ -33,8 +25,8 @@ impl Buffer {
 
     pub fn enter_visual_mode(&mut self) {
         self.mode = BufferMode::Visual;
-        self.select.start.x = self.cursor.x;
-        self.select.start.y = self.cursor.y;
+        self.selection.start.x = self.cursor.x;
+        self.selection.start.y = self.cursor.y;
     }
 
     pub fn enter_command_mode(&mut self) {

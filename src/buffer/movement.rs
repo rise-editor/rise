@@ -4,7 +4,7 @@ use crate::buffer::Buffer;
 
 impl Buffer {
     pub fn move_cursor(&mut self, row: usize, column: usize) {
-        self.cursor.y = min(row, self.get_row_count() - 1);
+        self.cursor.y = min(row, self.get_line_count() - 1);
         self.cursor.x = min(column, self.get_line_max_cursor_x(self.cursor.y));
 
         if self.cursor.x < self.scroll.x {
@@ -45,7 +45,7 @@ impl Buffer {
     }
 
     pub fn move_last_row(&mut self) {
-        self.move_cursor(self.get_row_count() - 1, self.cursor.x);
+        self.move_cursor(self.get_line_count() - 1, self.cursor.x);
     }
 
     pub fn move_first_column(&mut self) {

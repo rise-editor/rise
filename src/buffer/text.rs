@@ -1,8 +1,4 @@
-use std::cmp::min;
-
 use crate::buffer::Buffer;
-
-use super::mode::BufferMode;
 
 impl Buffer {
     pub fn get_line(&self, row: usize) -> &String {
@@ -13,34 +9,6 @@ impl Buffer {
         self.lines.get_mut(row).unwrap()
     }
 
-    pub fn get_line_visible_text(&self, row: usize) -> Option<String> {
-        if self.lines.len() <= row {
-            return None;
-        }
-
-        let line = self.get_line(row);
-
-        let start_index = self.scroll.x;
-        if line.len() <= start_index {
-            return Some(String::new());
-        }
-        let end_index = min(line.len(), self.scroll.x + (self.text_area.width as usize));
-
-        Some(line[start_index..end_index].to_string())
-    }
-
-    pub fn get_line_max_cursor_x(&self, row: usize) -> usize {
-        let line_length = self.get_line(row).len();
-
-        if line_length == 0 {
-            0
-        } else if let BufferMode::Insert = self.mode {
-            line_length
-        } else {
-            line_length - 1
-        }
-    }
-
     pub fn get_current_line(&self) -> &String {
         self.get_line(self.cursor.y)
     }
@@ -49,13 +17,16 @@ impl Buffer {
         self.get_line_mut(self.cursor.y)
     }
 
-    pub fn get_current_line_length(&self) -> usize {
+    pub fn get_line_text_length(&self, row: usize) -> usize {
+        self.get_line(row).len()
+    }
+
+    pub fn get_current_line_text_length(&self) -> usize {
         self.get_current_line().len()
     }
 
     pub fn get_line_last_char_index(&self, row: usize) -> Option<usize> {
-        let line = self.lines.get(row)?;
-        match line.len() {
+        match self.get_line_text_length(row) {
             0 => None,
             length => Some(length - 1),
         }
@@ -65,7 +36,7 @@ impl Buffer {
         self.get_line_last_char_index(self.cursor.y)
     }
 
-    pub fn get_row_count(&self) -> usize {
+    pub fn get_line_count(&self) -> usize {
         self.lines.len()
     }
 

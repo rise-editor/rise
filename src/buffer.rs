@@ -1,3 +1,4 @@
+pub mod highlight;
 pub mod maps;
 pub mod mode;
 pub mod movement;
@@ -11,6 +12,7 @@ use std::collections::HashMap;
 
 use crate::{
     buffer::{
+        highlight::Highlight,
         maps::{
             get_default_command_maps, get_default_insert_maps, get_default_normal_maps,
             get_default_visual_maps,
@@ -19,7 +21,7 @@ use crate::{
         options::BufferOptions,
         select::Select,
     },
-    core::{Point, Rectangle},
+    core::{Point, Rectangle, Style},
     editor::Editor,
 };
 
@@ -42,6 +44,8 @@ pub struct Buffer {
     pub popups: Vec<Buffer>,
     pub active_popup: Option<usize>,
     pub options: BufferOptions,
+    pub styles: HashMap<&'static str, Style>,
+    pub highlights: Vec<Highlight>,
 }
 
 impl Buffer {
@@ -65,6 +69,8 @@ impl Buffer {
             popups: vec![],
             active_popup: None,
             options: BufferOptions::default(),
+            styles: HashMap::new(),
+            highlights: vec![],
         };
 
         buffer.set_size(area);

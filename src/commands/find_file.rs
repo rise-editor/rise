@@ -1,6 +1,11 @@
 use std::process::Command;
 
-use crate::{buffer::Buffer, core::Rectangle, editor::Editor};
+use crate::{
+    buffer::Buffer,
+    core::{Rectangle, Style},
+    editor::Editor,
+    theme::SILVER,
+};
 
 pub struct FindFileCommand {}
 
@@ -16,6 +21,16 @@ impl FindFileCommand {
         files_popup.options.show_border = true;
         files_popup.options.show_info_column = false;
         files_popup.set_size(files_popup.area.clone()); // TODO: Move
+        files_popup.styles.insert(
+            "SelectedLineText",
+            Style {
+                fg: (88, 129, 87),
+                bg: SILVER,
+                bold: false,
+                italic: false,
+                underline: false,
+            },
+        );
 
         let mut textbox_popup = Buffer::new(Rectangle {
             x: files_popup.area.x,

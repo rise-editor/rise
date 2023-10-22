@@ -31,7 +31,10 @@ impl Terminal {
 
         Terminal {
             stdout,
-            screen: Screen::new(size.height, size.width),
+            screen: Screen::new(Size {
+                width: size.width,
+                height: size.height,
+            }),
         }
     }
 
@@ -80,8 +83,8 @@ impl Terminal {
 
         for row in 0..new_screen.size.height {
             for column in 0..new_screen.size.width {
-                let cell_new = new_screen.cell(row, column).unwrap();
-                let cell_old_option = self.screen.cell(row, column);
+                let cell_new = new_screen.get_cell(row, column).unwrap();
+                let cell_old_option = self.screen.get_cell(row, column);
 
                 if !force {
                     if let Some(cell_old) = cell_old_option {
@@ -97,9 +100,9 @@ impl Terminal {
                 }
 
                 let cell_bg = style::Color::Rgb {
-                    r: cell_new.background_color.0,
-                    g: cell_new.background_color.1,
-                    b: cell_new.background_color.2,
+                    r: cell_new.style.bg.0,
+                    g: cell_new.style.bg.1,
+                    b: cell_new.style.bg.2,
                 };
 
                 if bg != cell_bg {
@@ -108,9 +111,9 @@ impl Terminal {
                 }
 
                 let cell_fg = style::Color::Rgb {
-                    r: cell_new.color.0,
-                    g: cell_new.color.1,
-                    b: cell_new.color.2,
+                    r: cell_new.style.fg.0,
+                    g: cell_new.style.fg.1,
+                    b: cell_new.style.fg.2,
                 };
 
                 if fg != cell_fg {

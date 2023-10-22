@@ -78,6 +78,7 @@ impl Buffer {
     }
 
     pub fn set_size(&mut self, area: Rectangle<u16>) {
+        self.area = area.clone();
         self.info_area = area.clone();
         self.text_area = area.clone();
         self.info_area.width = 2 + self.lines.len().to_string().len() as u16;

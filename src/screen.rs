@@ -6,7 +6,7 @@ pub mod print_text;
 
 use crate::{
     buffer::mode::BufferMode,
-    core::{Point, Rectangle, Size, Style},
+    core::{point::Point, rectangle::Rectangle, size::Size, style::Style},
     editor::Editor,
     screen::cell::Cell,
     terminal::CursorStyle,

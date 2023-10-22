@@ -1,4 +1,4 @@
-use crate::{buffer::Buffer, core::Rectangle};
+use crate::{buffer::Buffer, core::rectangle::Rectangle};
 
 pub struct Highlight {
     pub name: &'static str,
@@ -42,7 +42,7 @@ impl Buffer {
 
 #[cfg(test)]
 mod tests {
-    use crate::{buffer::Highlight, core::Rectangle};
+    use crate::{buffer::Highlight, core::rectangle::Rectangle};
 
     fn test1(row: usize, start: usize, end: usize) -> bool {
         let area = Rectangle {

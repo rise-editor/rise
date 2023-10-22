@@ -1,4 +1,4 @@
-use crate::core::Point;
+use crate::core::point::Point;
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum CharType {

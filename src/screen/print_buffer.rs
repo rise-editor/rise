@@ -2,7 +2,7 @@ use std::cmp::{max, min};
 
 use crate::{
     buffer::{highlight::Highlight, Buffer},
-    core::{Rectangle, Style},
+    core::{rectangle::Rectangle, style::Style},
     screen::Screen,
     theme::THEME_ONE as T,
 };

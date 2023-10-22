@@ -10,9 +10,8 @@ pub mod theme;
 
 use std::io::Result;
 
-use crate::core::Rectangle;
-
 use crate::{
+    core::rectangle::Rectangle,
     editor::Editor,
     screen::Screen,
     terminal::{Terminal, TerminalEvent},

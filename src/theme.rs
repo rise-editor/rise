@@ -1,4 +1,4 @@
-use crate::core::Color;
+use crate::core::style::Color;
 
 pub struct Theme {
     pub tab_line_bg: Color,

@@ -22,7 +22,7 @@ use crate::{
         options::BufferOptions,
         visual_mode::Selection,
     },
-    core::{Point, Rectangle, Style},
+    core::{point::Point, rectangle::Rectangle, style::Style},
     editor::Editor,
 };
 

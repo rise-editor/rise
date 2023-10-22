@@ -1,4 +1,4 @@
-use crate::{buffer::Buffer, core::Point};
+use crate::{buffer::Buffer, core::point::Point};
 
 impl Buffer {
     pub fn get_cursor_screen_pos(&self) -> Point<u16> {

@@ -1,6 +1,6 @@
 use crate::{
     buffer::Buffer,
-    core::Point,
+    core::point::Point,
     motions::content_reader::{CharType, ContentReader, Direction},
 };
 

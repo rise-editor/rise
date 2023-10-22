@@ -4,7 +4,7 @@ use crate::{
         explorer::ExplorerCommand, find_file::FindFileCommand, read_file::ReadFileCommand,
         write_file::WriteFileCommand,
     },
-    core::{editable_text::EditableText, key::Key, Rectangle},
+    core::{editable_text::EditableText, key::Key, rectangle::Rectangle},
     tab::Tab,
 };
 

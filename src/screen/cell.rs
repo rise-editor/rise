@@ -1,5 +1,5 @@
 use crate::{
-    core::{Color, Style},
+    core::style::{Color, Style},
     screen::Screen,
 };
 

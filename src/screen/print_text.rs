@@ -1,4 +1,4 @@
-use crate::{core::Style, screen::Screen};
+use crate::{core::style::Style, screen::Screen};
 
 impl Screen {
     pub fn print_text(&mut self, row: u16, column: u16, text: &str, style: Style) {

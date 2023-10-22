@@ -1,28 +1,4 @@
-pub mod editable_text;
-pub mod key;
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Point<T> {
-    pub x: T,
-    pub y: T,
-}
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Size<T> {
-    pub width: T,
-    pub height: T,
-}
-
-pub type Color = (u8, u8, u8);
-
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Style {
-    pub fg: Color,
-    pub bg: Color,
-    pub bold: bool,
-    pub underline: bool,
-    pub italic: bool,
-}
+use crate::core::size::Size;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Rectangle<T> {

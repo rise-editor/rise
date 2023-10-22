@@ -2,7 +2,7 @@ use std::{fs, path::PathBuf};
 
 use crate::{
     buffer::{highlight::Highlight, Buffer},
-    core::Style,
+    core::style::Style,
     editor::Editor,
     theme::{GREEN, SILVER},
 };

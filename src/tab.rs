@@ -1,4 +1,4 @@
-use crate::{buffer::Buffer, core::Rectangle};
+use crate::{buffer::Buffer, core::rectangle::Rectangle};
 
 pub struct Tab {
     pub area: Rectangle<u16>,

@@ -1,6 +1,6 @@
 use crate::{
     buffer::mode::BufferMode,
-    core::Style,
+    core::style::Style,
     editor::Editor,
     screen::Screen,
     theme::{THEME_ONE as T, WHITE},

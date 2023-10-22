@@ -1,5 +1,7 @@
-use crate::buffer::{Buffer, BufferMode};
-use crate::core::Point;
+use crate::{
+    buffer::{Buffer, BufferMode},
+    core::point::Point,
+};
 
 pub struct Selection {
     pub start: Point<usize>,

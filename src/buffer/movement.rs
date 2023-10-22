@@ -59,7 +59,7 @@ impl Buffer {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{buffer::Buffer, core::Rectangle};
+    use crate::{buffer::Buffer, core::rectangle::Rectangle};
 
     fn create_buffer() -> Buffer {
         let mut area = Rectangle::<u16>::zero();

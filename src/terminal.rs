@@ -3,7 +3,7 @@ use std::io::{stdout, Result, Stdout, Write};
 use crossterm::{cursor, event, style, terminal, QueueableCommand};
 
 use crate::{
-    core::{key::Key, Size},
+    core::{key::Key, size::Size},
     screen::Screen,
 };
 

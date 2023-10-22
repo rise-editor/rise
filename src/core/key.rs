@@ -1,3 +1,4 @@
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Key {
     pub ctrl: bool,
     pub alt: bool,

@@ -2,7 +2,7 @@ use std::process::Command;
 
 use crate::{
     buffer::Buffer,
-    core::{Rectangle, Style},
+    core::{rectangle::Rectangle, style::Style},
     editor::Editor,
     theme::SILVER,
 };

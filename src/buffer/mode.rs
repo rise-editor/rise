@@ -6,6 +6,7 @@ pub enum BufferMode {
     Insert,
     Visual,
     Command,
+    Find,
 }
 
 impl Buffer {
@@ -20,6 +21,7 @@ impl Buffer {
     }
 
     pub fn enter_insert_mode(&mut self) {
+        self.clear_finds();
         self.mode = BufferMode::Insert;
     }
 
@@ -31,5 +33,9 @@ impl Buffer {
 
     pub fn enter_command_mode(&mut self) {
         self.mode = BufferMode::Command;
+    }
+
+    pub fn enter_find_mode(&mut self) {
+        self.mode = BufferMode::Find;
     }
 }

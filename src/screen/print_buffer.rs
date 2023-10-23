@@ -99,26 +99,14 @@ impl Screen {
                                 row_index + 1,
                                 buffer.info_area.width as usize - 2
                             ),
-                            Style {
-                                fg: T.info_column_fg,
-                                bg: T.info_column_bg,
-                                bold: false,
-                                italic: false,
-                                underline: false,
-                            },
+                            Style::new(T.info_column_fg, T.info_column_bg),
                         );
                     }
                     self.print_text(
                         buffer.area.y + y,
                         buffer.text_area.x,
                         &text,
-                        Style {
-                            fg: T.text_fg,
-                            bg: T.text_bg,
-                            bold: false,
-                            italic: false,
-                            underline: false,
-                        },
+                        Style::new(T.text_fg, T.text_bg),
                     );
                 }
                 None => {
@@ -127,13 +115,7 @@ impl Screen {
                             buffer.area.y + y,
                             buffer.area.x,
                             "~",
-                            Style {
-                                fg: T.info_column_fg,
-                                bg: T.bg,
-                                bold: false,
-                                italic: false,
-                                underline: false,
-                            },
+                            Style::new(T.info_column_fg, T.bg),
                         );
                     }
                 }

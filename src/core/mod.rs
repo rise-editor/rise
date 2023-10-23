@@ -4,3 +4,4 @@ pub mod point;
 pub mod rectangle;
 pub mod size;
 pub mod style;
+pub mod text_position;

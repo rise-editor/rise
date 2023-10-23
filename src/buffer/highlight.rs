@@ -1,4 +1,8 @@
-use crate::{buffer::Buffer, core::rectangle::Rectangle};
+use crate::{
+    buffer::Buffer,
+    core::{rectangle::Rectangle, style::Style},
+    theme::THEME_ONE as T,
+};
 
 pub struct Highlight {
     pub name: &'static str,
@@ -6,6 +10,10 @@ pub struct Highlight {
     pub start: usize,
     pub end: usize,
 }
+
+pub const HL_CURRENT_LINE: &str = "CurrentLine";
+pub const HL_CURRENT_LINE_TEXT: &str = "CurrentLineText";
+pub const HL_FIND_TEXT: &str = "FindText";
 
 impl Highlight {
     pub fn is_visible_in_area(&self, area: Rectangle<usize>) -> bool {
@@ -17,11 +25,16 @@ impl Highlight {
 }
 
 impl Buffer {
+    pub fn set_static_highlights(&mut self) {
+        self.styles
+            .insert(HL_FIND_TEXT, Style::new(T.text_finded_fg, T.text_finded_bg));
+    }
+
     pub fn get_dynamic_highlights(&self) -> Vec<Highlight> {
         let mut list: Vec<Highlight> = vec![];
 
         list.push(Highlight {
-            name: "CurrentLine",
+            name: HL_CURRENT_LINE,
             row: self.cursor.x,
             start: self.scroll.x,
             end: self.text_area.width as usize,
@@ -29,7 +42,7 @@ impl Buffer {
 
         if let Some(end) = self.get_current_line_last_char_index() {
             list.push(Highlight {
-                name: "CurrentLineText",
+                name: HL_CURRENT_LINE_TEXT,
                 row: self.cursor.y,
                 start: 0,
                 end,
@@ -38,11 +51,18 @@ impl Buffer {
 
         list
     }
+
+    pub fn clear_highlight(&mut self, name: &str) {
+        self.highlights.retain(|h| h.name != name);
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{buffer::Highlight, core::rectangle::Rectangle};
+    use crate::{
+        buffer::{Buffer, Highlight},
+        core::rectangle::Rectangle,
+    };
 
     fn test1(row: usize, start: usize, end: usize) -> bool {
         let area = Rectangle {
@@ -70,5 +90,38 @@ mod tests {
         assert_eq!(true, test1(0, 0, 10));
         assert_eq!(false, test1(0, 10, 10));
         assert_eq!(false, test1(10, 0, 1));
+    }
+
+    #[test]
+    fn clear_highlight_test() {
+        let mut buffer = Buffer::new(Rectangle {
+            x: 0,
+            y: 0,
+            width: 10,
+            height: 10,
+        });
+
+        buffer.highlights.push(Highlight {
+            name: "Foo",
+            row: 0,
+            start: 0,
+            end: 1,
+        });
+        buffer.highlights.push(Highlight {
+            name: "Bar",
+            row: 0,
+            start: 0,
+            end: 1,
+        });
+        buffer.highlights.push(Highlight {
+            name: "Baz",
+            row: 0,
+            start: 0,
+            end: 1,
+        });
+
+        buffer.clear_highlight("Foo");
+
+        assert_eq!(2, buffer.highlights.len());
     }
 }

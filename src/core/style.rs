@@ -5,6 +5,18 @@ pub struct Style {
     pub fg: Color,
     pub bg: Color,
     pub bold: bool,
-    pub underline: bool,
     pub italic: bool,
+    pub underline: bool,
+}
+
+impl Style {
+    pub fn new(fg: Color, bg: Color) -> Self {
+        Self {
+            fg,
+            bg,
+            bold: false,
+            italic: false,
+            underline: false,
+        }
+    }
 }

@@ -7,8 +7,8 @@ pub struct ReadFileCommand {}
 
 impl ReadFileCommand {
     pub fn run(editor: &mut Editor) {
-        let command = editor.command.text.clone();
-        let buffer = editor.get_active_buffer_mut();
+        let command = editor.input.text.clone();
+        let buffer = editor.get_active_tab_mut().create_new_buffer();
         let file_name = &command.trim()[2..];
         if file_name.starts_with("~/") {
             let mut home_path = home::home_dir().unwrap();

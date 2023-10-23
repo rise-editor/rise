@@ -18,6 +18,12 @@ impl EditableText {
         }
     }
 
+    pub fn delete_char_after(&mut self) {
+        if self.cursor_x < self.text.len() {
+            self.text.remove(self.cursor_x);
+        }
+    }
+
     pub fn move_left(&mut self) {
         if self.cursor_x > 0 {
             self.cursor_x = self.cursor_x - 1;
@@ -31,6 +37,21 @@ impl EditableText {
     pub fn reset(&mut self) {
         self.text = String::new();
         self.cursor_x = 0;
+    }
+
+    pub fn handle_key(&mut self, key: &str) {
+        match key {
+            "left" => self.move_left(),
+            "right" => self.move_right(),
+            "<c-h>" => self.delete_char(),
+            "backspace" => self.delete_char(),
+            "delete" => self.delete_char_after(),
+            other => {
+                if other.len() == 1 {
+                    self.insert_char(other.chars().nth(0).unwrap());
+                }
+            }
+        };
     }
 }
 

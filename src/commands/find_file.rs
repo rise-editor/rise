@@ -76,7 +76,7 @@ impl FindFileCommand {
             let buffer = editor.get_active_buffer();
             let popup = buffer.popups.get(buffer.popups.len() - 2).unwrap();
             let filename = popup.get_line(popup.cursor.y);
-            editor.command.text = format!("e {}", filename).to_string();
+            editor.input.text = format!("e {}", filename).to_string();
 
             let buffer = editor.get_active_buffer_mut();
             buffer.popups.pop();

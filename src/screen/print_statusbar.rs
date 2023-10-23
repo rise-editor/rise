@@ -40,7 +40,12 @@ impl Screen {
                 T.status_visual_mode_bg,
             ),
             BufferMode::Command => (
-                format!(":{}", editor.command.text),
+                format!(":{}", editor.input.text),
+                T.status_command_mode_fg,
+                T.status_command_mode_bg,
+            ),
+            BufferMode::Find => (
+                format!("/{}", editor.input.text),
                 T.status_command_mode_fg,
                 T.status_command_mode_bg,
             ),
@@ -50,13 +55,7 @@ impl Screen {
             editor.status_area.y,
             editor.status_area.x,
             &format!("{}", mode),
-            Style {
-                fg,
-                bg,
-                bold: false,
-                italic: false,
-                underline: false,
-            },
+            Style::new(fg, bg),
         );
     }
 }

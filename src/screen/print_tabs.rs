@@ -11,13 +11,7 @@ impl Screen {
             editor.tabs_area.y,
             editor.tabs_area.x,
             editor.tabs_area.x + editor.tabs_area.width - 1,
-            Style {
-                fg: WHITE,
-                bg: T.status_line_bg,
-                bold: false,
-                italic: false,
-                underline: false,
-            },
+            Style::new(WHITE, T.status_line_bg),
         );
 
         let row = editor.tabs_area.y;
@@ -42,13 +36,7 @@ impl Screen {
                 row,
                 column,
                 format!(" {} ", text).as_str(),
-                Style {
-                    fg,
-                    bg,
-                    bold: false,
-                    italic: false,
-                    underline: false,
-                },
+                Style::new(fg, bg),
             );
 
             column += text.len() as u16 + 2;

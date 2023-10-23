@@ -71,7 +71,7 @@ fn initialize_explorer_buffer(buffer: &mut Buffer, base_path: &str) {
             path = String::from(".");
         }
 
-        editor.command.text = format!("e {}", path);
+        editor.input.text = format!("e {}", path);
         editor.run_command();
     });
 

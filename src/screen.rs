@@ -53,15 +53,15 @@ impl Screen {
             BufferMode::Visual => CursorStyle::BlinkingBlock,
             BufferMode::Insert => CursorStyle::BlinkingBar,
             BufferMode::Command => CursorStyle::BlinkingBar,
+            BufferMode::Find => CursorStyle::BlinkingBar,
         };
 
-        screen.cursor = if let BufferMode::Command = editor.get_active_buffer_or_popup().mode {
-            Point {
+        screen.cursor = match editor.get_active_buffer_or_popup().mode {
+            BufferMode::Command | BufferMode::Find => Point {
                 y: editor.status_area.y,
-                x: (editor.status_area.x + 1 + editor.command.cursor_x as u16),
-            }
-        } else {
-            editor.get_active_buffer_or_popup().get_cursor_screen_pos()
+                x: (editor.status_area.x + 1 + editor.input.cursor_x as u16),
+            },
+            _ => editor.get_active_buffer_or_popup().get_cursor_screen_pos(),
         };
 
         screen.print_tabs(editor);

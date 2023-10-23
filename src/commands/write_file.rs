@@ -7,7 +7,7 @@ pub struct WriteFileCommand {}
 
 impl WriteFileCommand {
     pub fn run(editor: &mut Editor) {
-        let command = editor.command.text.clone();
+        let command = editor.input.text.clone();
         let buffer = editor.get_active_buffer_mut();
         let path;
 

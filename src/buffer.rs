@@ -1,3 +1,4 @@
+pub mod find;
 pub mod helper;
 pub mod highlight;
 pub mod maps;
@@ -14,15 +15,12 @@ use std::collections::HashMap;
 use crate::{
     buffer::{
         highlight::Highlight,
-        maps::{
-            get_default_command_maps, get_default_insert_maps, get_default_normal_maps,
-            get_default_visual_maps,
-        },
+        maps::{get_default_insert_maps, get_default_normal_maps, get_default_visual_maps},
         mode::BufferMode,
         options::BufferOptions,
         visual_mode::Selection,
     },
-    core::{point::Point, rectangle::Rectangle, style::Style},
+    core::{point::Point, rectangle::Rectangle, style::Style, text_position::TextPosition},
     editor::Editor,
 };
 
@@ -38,7 +36,6 @@ pub struct Buffer {
     pub cursor: Point<usize>,
     pub lines: Vec<String>,
     pub selection: Selection,
-    pub actions_command: ActionMap,
     pub actions_insert: ActionMap,
     pub actions_normal: ActionMap,
     pub actions_visual: ActionMap,
@@ -47,6 +44,7 @@ pub struct Buffer {
     pub options: BufferOptions,
     pub styles: HashMap<&'static str, Style>,
     pub highlights: Vec<Highlight>,
+    pub finds: Vec<TextPosition>,
 }
 
 impl Buffer {
@@ -63,7 +61,6 @@ impl Buffer {
             selection: Selection {
                 start: Point { x: 0, y: 0 },
             },
-            actions_command: get_default_command_maps(),
             actions_insert: get_default_insert_maps(),
             actions_normal: get_default_normal_maps(),
             actions_visual: get_default_visual_maps(),
@@ -72,8 +69,9 @@ impl Buffer {
             options: BufferOptions::default(),
             styles: HashMap::new(),
             highlights: vec![],
+            finds: vec![],
         };
-
+        buffer.set_static_highlights();
         buffer.set_size(area);
         buffer
     }

@@ -15,7 +15,7 @@ pub struct Editor {
     pub status_area: Rectangle<u16>,
     pub tabs: Vec<Tab>,
     pub active_tab: usize,
-    pub command: EditableText,
+    pub input: EditableText,
 }
 
 impl Editor {
@@ -27,7 +27,7 @@ impl Editor {
             status_area: Rectangle::zero(),
             tabs: vec![],
             active_tab: 0,
-            command: EditableText {
+            input: EditableText {
                 text: String::new(),
                 cursor_x: 0,
             },
@@ -121,20 +121,41 @@ impl Editor {
                     }
                 }
             },
-            BufferMode::Command => match buffer.actions_command.get(&key.to_string().as_str()) {
-                Some(action) => action(self),
-                None => {
-                    if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
-                        let ch = key.code.chars().nth(0).unwrap();
-                        self.command.insert_char(ch);
-                    }
+            BufferMode::Command => match key.to_string().as_str() {
+                "esc" => {
+                    self.get_active_buffer_or_popup_mut().enter_normal_mode();
+                }
+                "enter" => {
+                    self.run_command();
+                }
+                other => {
+                    self.input.handle_key(other);
                 }
             },
+            BufferMode::Find => {
+                match key.to_string().as_str() {
+                    "esc" => {
+                        self.get_active_buffer_or_popup_mut().enter_normal_mode();
+                    }
+                    "enter" => {
+                        self.get_active_buffer_or_popup_mut().enter_normal_mode();
+                        self.get_active_buffer_or_popup_mut().move_to_next_find();
+                    }
+                    other => {
+                        self.input.handle_key(other);
+                        let text = self.input.text.clone();
+                        if text.len() > 0 {
+                            let buffer = self.get_active_buffer_or_popup_mut();
+                            buffer.find(&text);
+                        }
+                    }
+                };
+            }
         }
     }
 
     pub fn run_command(&mut self) {
-        let command = self.command.text.trim();
+        let command = self.input.text.trim();
 
         if command == "w" || command.starts_with("w ") {
             WriteFileCommand::run(self);
@@ -146,7 +167,7 @@ impl Editor {
             FindFileCommand::run(self);
         }
 
-        self.command.reset();
+        self.input.reset();
         self.get_active_buffer_mut().enter_normal_mode();
     }
 }

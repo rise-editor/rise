@@ -33,42 +33,42 @@ pub fn get_default_insert_maps() -> ActionMap {
 pub fn get_default_normal_maps() -> ActionMap {
     let mut map: ActionMap = HashMap::new();
     map.insert("left", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left()
+        editor.get_active_buffer_or_popup_mut().move_left();
     });
     map.insert("down", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down()
+        editor.get_active_buffer_or_popup_mut().move_down();
     });
     map.insert("up", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up()
+        editor.get_active_buffer_or_popup_mut().move_up();
     });
     map.insert("right", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right()
+        editor.get_active_buffer_or_popup_mut().move_right();
     });
 
     map.insert("h", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left()
+        editor.get_active_buffer_or_popup_mut().move_left();
     });
     map.insert("j", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down()
+        editor.get_active_buffer_or_popup_mut().move_down();
     });
     map.insert("k", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up()
+        editor.get_active_buffer_or_popup_mut().move_up();
     });
     map.insert("l", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right()
+        editor.get_active_buffer_or_popup_mut().move_right();
     });
 
     map.insert("g", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_first_row()
+        editor.get_active_buffer_or_popup_mut().move_first_row();
     });
     map.insert("G", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_last_row()
+        editor.get_active_buffer_or_popup_mut().move_last_row();
     });
     map.insert("0", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_first_column()
+        editor.get_active_buffer_or_popup_mut().move_first_column();
     });
     map.insert("$", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_last_column()
+        editor.get_active_buffer_or_popup_mut().move_last_column();
     });
 
     map.insert("w", |editor| {
@@ -95,7 +95,7 @@ pub fn get_default_normal_maps() -> ActionMap {
     });
 
     map.insert("x", |editor| {
-        editor.get_active_buffer_or_popup_mut().delete_char()
+        editor.get_active_buffer_or_popup_mut().delete_char();
     });
 
     map.insert("I", |editor| {
@@ -128,24 +128,24 @@ pub fn get_default_normal_maps() -> ActionMap {
         buffer.enter_insert_mode();
     });
     map.insert(":", |editor| {
-        editor.command.reset();
-        editor.get_active_buffer_or_popup_mut().enter_command_mode()
+        editor.input.reset();
+        editor.get_active_buffer_or_popup_mut().enter_command_mode();
     });
     map.insert("v", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_visual_mode()
+        editor.get_active_buffer_or_popup_mut().enter_visual_mode();
     });
-    return map;
-}
-
-pub fn get_default_command_maps() -> ActionMap {
-    let mut map: ActionMap = HashMap::new();
-    map.insert("esc", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_normal_mode()
+    map.insert("/", |editor| {
+        editor.input.reset();
+        editor.get_active_buffer_or_popup_mut().enter_find_mode();
     });
-    map.insert("enter", |editor| editor.run_command());
-    map.insert("backspace", |editor| editor.command.delete_char());
-    map.insert("left", |editor| editor.command.move_left());
-    map.insert("right", |editor| editor.command.move_right());
+    map.insert("n", |editor| {
+        editor.get_active_buffer_or_popup_mut().move_to_next_find();
+    });
+    map.insert("N", |editor| {
+        editor
+            .get_active_buffer_or_popup_mut()
+            .move_to_previous_find();
+    });
     return map;
 }
 

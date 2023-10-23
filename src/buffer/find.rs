@@ -11,6 +11,10 @@ impl Buffer {
         self.clear_highlight(HL_FIND_TEXT);
         self.finds.clear();
 
+        if text.len() == 0 {
+            return;
+        }
+
         for row in 0..self.get_line_count() {
             let line = self.get_line(row).clone();
             if text.len() <= line.len() {

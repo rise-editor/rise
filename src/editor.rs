@@ -144,10 +144,8 @@ impl Editor {
                     other => {
                         self.input.handle_key(other);
                         let text = self.input.text.clone();
-                        if text.len() > 0 {
-                            let buffer = self.get_active_buffer_or_popup_mut();
-                            buffer.find(&text);
-                        }
+                        let buffer = self.get_active_buffer_or_popup_mut();
+                        buffer.find(&text);
                     }
                 };
             }

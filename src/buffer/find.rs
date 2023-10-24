@@ -16,7 +16,7 @@ impl Buffer {
         }
 
         for row in 0..self.get_line_count() {
-            let line = self.get_line(row).clone();
+            let line = self.get_line(row).unwrap().clone();
             if text.len() <= line.len() {
                 let column_end = line.len() - text.len() + 1;
                 for column in 0..column_end {

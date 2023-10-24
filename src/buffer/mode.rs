@@ -38,7 +38,6 @@ impl Buffer {
     pub fn enter_insert_mode_end(&mut self) {
         self.enter_insert_mode();
         self.move_last_column();
-        self.move_right();
     }
 
     pub fn enter_visual_mode(&mut self) {

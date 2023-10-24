@@ -10,7 +10,7 @@ use crate::{
 impl Buffer {
     pub fn move_cursor(&mut self, row: usize, column: usize) {
         self.cursor.y = min(row, self.get_line_count() - 1);
-        self.cursor.x = min(column, self.get_line_max_cursor_x(self.cursor.y));
+        self.cursor.x = min(column, self.get_line_max_cursor_x(self.cursor.y).unwrap());
 
         if self.cursor.x < self.scroll.x {
             self.scroll.x = self.cursor.x
@@ -58,7 +58,7 @@ impl Buffer {
     }
 
     pub fn move_last_column(&mut self) {
-        self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.y));
+        self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.y).unwrap());
     }
 
     pub fn move_previous_word(&mut self) {

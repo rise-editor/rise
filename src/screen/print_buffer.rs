@@ -88,7 +88,7 @@ impl Screen {
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
             match buffer.get_line_visible_text(row_index) {
-                Some(text) => {
+                Ok(text) => {
                     // TODO: Move this and print in separate functions
                     if buffer.options.show_info_column {
                         self.print_text(
@@ -109,7 +109,7 @@ impl Screen {
                         Style::new(T.text_fg, T.text_bg),
                     );
                 }
-                None => {
+                Err(_) => {
                     if buffer.options.show_info_column {
                         self.print_text(
                             buffer.area.y + y,

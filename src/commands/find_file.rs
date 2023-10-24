@@ -75,7 +75,7 @@ impl FindFileCommand {
         textbox_popup.actions_insert.insert("enter", |editor| {
             let buffer = editor.get_active_buffer();
             let popup = buffer.popups.get(buffer.popups.len() - 2).unwrap();
-            let filename = popup.get_line(popup.cursor.y);
+            let filename = popup.get_current_line();
             editor.input.text = format!("e {}", filename).to_string();
 
             let buffer = editor.get_active_buffer_mut();

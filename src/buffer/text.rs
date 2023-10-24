@@ -1,24 +1,30 @@
 use crate::buffer::Buffer;
 
 impl Buffer {
-    pub fn get_line(&self, row: usize) -> &String {
-        self.lines.get(row).unwrap()
+    pub fn get_line(&self, row: usize) -> Result<&String, String> {
+        match self.lines.get(row) {
+            Some(line) => Ok(line),
+            None => Err(format!("No line at {}", row)),
+        }
     }
 
-    pub fn get_line_mut(&mut self, row: usize) -> &mut String {
-        self.lines.get_mut(row).unwrap()
+    pub fn get_line_mut(&mut self, row: usize) -> Result<&mut String, String> {
+        match self.lines.get_mut(row) {
+            Some(line) => Ok(line),
+            None => Err(format!("No line at {}", row)),
+        }
     }
 
     pub fn get_current_line(&self) -> &String {
-        self.get_line(self.cursor.y)
+        self.get_line(self.cursor.y).unwrap()
     }
 
     pub fn get_current_line_mut(&mut self) -> &mut String {
-        self.get_line_mut(self.cursor.y)
+        self.get_line_mut(self.cursor.y).unwrap()
     }
 
-    pub fn get_line_text_length(&self, row: usize) -> usize {
-        self.get_line(row).len()
+    pub fn get_line_text_length(&self, row: usize) -> Result<usize, String> {
+        Ok(self.get_line(row)?.len())
     }
 
     pub fn get_current_line_text_length(&self) -> usize {
@@ -26,7 +32,7 @@ impl Buffer {
     }
 
     pub fn get_line_last_char_index(&self, row: usize) -> Option<usize> {
-        match self.get_line_text_length(row) {
+        match self.get_line_text_length(row).unwrap() {
             0 => None,
             length => Some(length - 1),
         }

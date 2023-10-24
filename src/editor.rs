@@ -138,8 +138,10 @@ impl Editor {
                         self.get_active_buffer_or_popup_mut().enter_normal_mode();
                     }
                     "enter" => {
-                        self.get_active_buffer_or_popup_mut().enter_normal_mode();
-                        self.get_active_buffer_or_popup_mut().move_to_next_find();
+                        self.input.reset();
+                        let buffer = self.get_active_buffer_or_popup_mut();
+                        buffer.enter_normal_mode();
+                        buffer.move_to_next_find();
                     }
                     other => {
                         self.input.handle_key(other);

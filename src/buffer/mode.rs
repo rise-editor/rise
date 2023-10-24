@@ -25,6 +25,22 @@ impl Buffer {
         self.mode = BufferMode::Insert;
     }
 
+    pub fn enter_insert_mode_start(&mut self) {
+        self.enter_insert_mode();
+        self.move_first_column();
+    }
+
+    pub fn enter_insert_mode_after(&mut self) {
+        self.enter_insert_mode();
+        self.move_right();
+    }
+
+    pub fn enter_insert_mode_end(&mut self) {
+        self.enter_insert_mode();
+        self.move_last_column();
+        self.move_right();
+    }
+
     pub fn enter_visual_mode(&mut self) {
         self.mode = BufferMode::Visual;
         self.selection.start.x = self.cursor.x;

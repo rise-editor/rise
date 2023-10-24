@@ -46,10 +46,25 @@ impl Buffer {
         }
     }
 
-    pub fn insert_newline(&mut self, row: usize) {
+    pub fn delete_char_before_cursor(&mut self) {
+        self.delete_char_before(self.cursor.y, self.cursor.x);
+    }
+
+    pub fn insert_line(&mut self, row: usize) {
         self.lines.insert(row, String::new());
-        self.move_cursor(row, 0);
         self.set_size(self.area.clone());
+    }
+
+    pub fn open_new_line_previous(&mut self) {
+        let row = self.cursor.y + 1;
+        self.insert_line(row);
+        self.move_cursor(row, 0);
+    }
+
+    pub fn open_new_line_next(&mut self) {
+        let row = self.cursor.y + 1;
+        self.insert_line(row);
+        self.move_cursor(row, 0);
     }
 
     pub fn split_line(&mut self, row: usize, column: usize) {
@@ -66,11 +81,21 @@ impl Buffer {
         self.set_size(self.area.clone());
     }
 
+    pub fn split_line_cursor(&mut self) {
+        self.split_line(self.cursor.y, self.cursor.x);
+    }
+
     pub fn join_lines(&mut self, row1: usize, row2: usize) {
         let line2 = self.get_line(row2).clone();
         let line1 = self.get_line_mut(row1);
         line1.push_str(&line2);
         self.lines.remove(row2);
         self.set_size(self.area.clone());
+    }
+
+    pub fn join_lines_cursor(&mut self) {
+        if self.cursor.y < self.get_line_count() - 1 {
+            self.join_lines(self.cursor.y, self.cursor.y + 1);
+        }
     }
 }

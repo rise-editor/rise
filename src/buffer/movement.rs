@@ -1,6 +1,11 @@
 use std::cmp::min;
 
-use crate::buffer::Buffer;
+use crate::{
+    buffer::Buffer,
+    motions::motions::{
+        get_next_word_end_position, get_next_word_start_position, get_previous_word_start_position,
+    },
+};
 
 impl Buffer {
     pub fn move_cursor(&mut self, row: usize, column: usize) {
@@ -40,11 +45,11 @@ impl Buffer {
         self.move_cursor(self.cursor.y + 1, self.cursor.x);
     }
 
-    pub fn move_first_row(&mut self) {
+    pub fn move_first_line(&mut self) {
         self.move_cursor(0, self.cursor.x);
     }
 
-    pub fn move_last_row(&mut self) {
+    pub fn move_last_line(&mut self) {
         self.move_cursor(self.get_line_count() - 1, self.cursor.x);
     }
 
@@ -54,6 +59,21 @@ impl Buffer {
 
     pub fn move_last_column(&mut self) {
         self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.y));
+    }
+
+    pub fn move_previous_word(&mut self) {
+        let new_position = get_previous_word_start_position(self);
+        self.move_cursor(new_position.y, new_position.x);
+    }
+
+    pub fn move_next_word(&mut self) {
+        let new_position = get_next_word_start_position(self);
+        self.move_cursor(new_position.y, new_position.x);
+    }
+
+    pub fn move_next_word_end(&mut self) {
+        let new_position = get_next_word_end_position(self);
+        self.move_cursor(new_position.y, new_position.x);
     }
 }
 

@@ -1,189 +1,88 @@
 use std::collections::HashMap;
 
-use crate::{
-    buffer::ActionMap,
-    motions::motions::{
-        get_next_word_end_position, get_next_word_start_position, get_previous_word_start_position,
-    },
-};
+use crate::buffer::ActionMap;
 
-pub fn get_default_insert_maps() -> ActionMap {
-    let mut map: ActionMap = HashMap::new();
-    map.insert("esc", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_normal_mode()
-    });
-    map.insert("enter", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.split_line(buffer.cursor.y, buffer.cursor.x)
-    });
-    map.insert("backspace", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.delete_char_before(buffer.cursor.y, buffer.cursor.x)
-    });
-    map.insert("delete", |editor| {
-        editor.get_active_buffer_or_popup_mut().delete_char()
-    });
-    map.insert("<c-j>", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.split_line(buffer.cursor.y, buffer.cursor.x);
-    });
-    return map;
+macro_rules! buffer_action {
+    ($action:ident) => {
+        |editor| {
+            let buffer = editor.get_active_buffer_or_popup_mut();
+            buffer.$action()
+        }
+    };
 }
 
 pub fn get_default_normal_maps() -> ActionMap {
     let mut map: ActionMap = HashMap::new();
-    map.insert("left", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left();
-    });
-    map.insert("down", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down();
-    });
-    map.insert("up", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up();
-    });
-    map.insert("right", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right();
-    });
 
-    map.insert("h", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left();
-    });
-    map.insert("j", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down();
-    });
-    map.insert("k", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up();
-    });
-    map.insert("l", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right();
-    });
+    // movements
+    map.insert("left", buffer_action!(move_left));
+    map.insert("down", buffer_action!(move_down));
+    map.insert("up", buffer_action!(move_up));
+    map.insert("right", buffer_action!(move_right));
 
-    map.insert("g", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_first_row();
-    });
-    map.insert("G", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_last_row();
-    });
-    map.insert("0", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_first_column();
-    });
-    map.insert("$", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_last_column();
-    });
+    map.insert("h", buffer_action!(move_left));
+    map.insert("j", buffer_action!(move_down));
+    map.insert("k", buffer_action!(move_up));
+    map.insert("l", buffer_action!(move_right));
 
-    map.insert("w", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        let new_position = get_next_word_start_position(buffer);
-        buffer.move_cursor(new_position.y, new_position.x);
-    });
-    map.insert("e", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        let new_position = get_next_word_end_position(buffer);
-        buffer.move_cursor(new_position.y, new_position.x);
-    });
-    map.insert("b", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        let new_position = get_previous_word_start_position(buffer);
-        buffer.move_cursor(new_position.y, new_position.x);
-    });
+    map.insert("0", buffer_action!(move_first_column));
+    map.insert("$", buffer_action!(move_last_column));
+    map.insert("g", buffer_action!(move_first_line));
+    map.insert("G", buffer_action!(move_last_line));
 
-    map.insert("J", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        if buffer.cursor.y < buffer.get_line_count() - 1 {
-            buffer.join_lines(buffer.cursor.y, buffer.cursor.y + 1);
-        }
-    });
+    map.insert("w", buffer_action!(move_next_word));
+    map.insert("e", buffer_action!(move_next_word_end));
+    map.insert("b", buffer_action!(move_previous_word));
 
-    map.insert("x", |editor| {
-        editor.get_active_buffer_or_popup_mut().delete_char();
-    });
+    map.insert("n", buffer_action!(move_to_next_find));
+    map.insert("N", buffer_action!(move_to_previous_find));
 
-    map.insert("I", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.move_first_column();
-        buffer.enter_insert_mode();
-    });
-    map.insert("i", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_insert_mode()
-    });
-    map.insert("A", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.move_last_column();
-        buffer.enter_insert_mode();
-        buffer.move_right();
-    });
-    map.insert("a", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.enter_insert_mode();
-        buffer.move_right();
-    });
-    map.insert("O", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.insert_newline(buffer.cursor.y);
-        buffer.enter_insert_mode();
-    });
-    map.insert("o", |editor| {
-        let buffer = editor.get_active_buffer_or_popup_mut();
-        buffer.insert_newline(buffer.cursor.y + 1);
-        buffer.enter_insert_mode();
-    });
-    map.insert(":", |editor| {
-        editor.input.reset();
-        editor.get_active_buffer_or_popup_mut().enter_command_mode();
-    });
-    map.insert("v", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_visual_mode();
-    });
-    map.insert("/", |editor| {
-        editor.input.reset();
-        editor.get_active_buffer_or_popup_mut().enter_find_mode();
-    });
-    map.insert("n", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_to_next_find();
-    });
-    map.insert("N", |editor| {
-        editor
-            .get_active_buffer_or_popup_mut()
-            .move_to_previous_find();
-    });
-    return map;
+    // operations
+    map.insert("x", buffer_action!(delete_char));
+    map.insert("J", buffer_action!(join_lines_cursor));
+    map.insert("O", buffer_action!(open_new_line_previous));
+    map.insert("o", buffer_action!(open_new_line_next));
+
+    // modes
+    map.insert("i", buffer_action!(enter_insert_mode));
+    map.insert("I", buffer_action!(enter_insert_mode_start));
+    map.insert("a", buffer_action!(enter_insert_mode_after));
+    map.insert("A", buffer_action!(enter_insert_mode_end));
+    map.insert(":", buffer_action!(enter_command_mode));
+    map.insert("v", buffer_action!(enter_visual_mode));
+    map.insert("/", buffer_action!(enter_find_mode));
+
+    map
 }
 
 pub fn get_default_visual_maps() -> ActionMap {
     let mut map: ActionMap = HashMap::new();
-    map.insert("esc", |editor| {
-        editor.get_active_buffer_or_popup_mut().enter_normal_mode()
-    });
 
-    map.insert("left", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left()
-    });
-    map.insert("down", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down()
-    });
-    map.insert("up", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up()
-    });
-    map.insert("right", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right()
-    });
+    map.insert("esc", buffer_action!(enter_normal_mode));
 
-    map.insert("h", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_left()
-    });
-    map.insert("j", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_down()
-    });
-    map.insert("k", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_up()
-    });
-    map.insert("l", |editor| {
-        editor.get_active_buffer_or_popup_mut().move_right()
-    });
+    map.insert("left", buffer_action!(move_left));
+    map.insert("down", buffer_action!(move_down));
+    map.insert("up", buffer_action!(move_up));
+    map.insert("right", buffer_action!(move_right));
 
-    map.insert("o", |editor| {
-        editor.get_active_buffer_or_popup_mut().reverse_selection()
-    });
+    map.insert("h", buffer_action!(move_left));
+    map.insert("j", buffer_action!(move_down));
+    map.insert("k", buffer_action!(move_up));
+    map.insert("l", buffer_action!(move_right));
 
-    return map;
+    map.insert("o", buffer_action!(reverse_selection));
+
+    map
+}
+
+pub fn get_default_insert_maps() -> ActionMap {
+    let mut map: ActionMap = HashMap::new();
+
+    map.insert("esc", buffer_action!(enter_normal_mode));
+    map.insert("enter", buffer_action!(split_line_cursor));
+    map.insert("backspace", buffer_action!(delete_char_before_cursor));
+    map.insert("delete", buffer_action!(delete_char));
+    map.insert("<c-j>", buffer_action!(split_line_cursor));
+
+    map
 }

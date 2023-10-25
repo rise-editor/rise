@@ -27,10 +27,7 @@ impl Editor {
             status_area: Rectangle::zero(),
             tabs: vec![],
             active_tab: 0,
-            input: EditableText {
-                text: String::new(),
-                cursor_x: 0,
-            },
+            input: EditableText::new(),
         };
 
         editor.set_size(area);

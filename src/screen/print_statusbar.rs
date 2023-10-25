@@ -3,7 +3,7 @@ use crate::{
     core::style::Style,
     editor::Editor,
     screen::Screen,
-    theme::{THEME_ONE as T, WHITE},
+    theme::{BLACK, THEME_ONE as T, WHITE},
 };
 
 impl Screen {
@@ -56,6 +56,15 @@ impl Screen {
             editor.status_area.x,
             &format!("{}", mode),
             Style::new(fg, bg),
+        );
+
+        let cursor_info = format!(" {}x{} ", buffer.cursor.x + 1, buffer.cursor.y + 1);
+
+        self.print_text(
+            editor.status_area.y,
+            editor.status_area.x + editor.status_area.width - (cursor_info.len() as u16) - 1,
+            &cursor_info,
+            Style::new(BLACK, T.status_line_bg),
         );
     }
 }

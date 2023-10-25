@@ -87,6 +87,13 @@ impl Screen {
 
         for y in 0..buffer.area.height {
             let row_index = buffer.scroll.y + y as usize;
+            let relative_line_number = if row_index == buffer.cursor.y {
+                row_index + 1
+            } else if row_index < buffer.cursor.y {
+                buffer.cursor.y - row_index
+            } else {
+                row_index - buffer.cursor.y
+            };
             match buffer.get_line_visible_text(row_index) {
                 Ok(text) => {
                     // TODO: Move this and print in separate functions
@@ -96,7 +103,7 @@ impl Screen {
                             buffer.area.x,
                             &format!(
                                 " {:>1$} ",
-                                row_index + 1,
+                                relative_line_number,
                                 buffer.info_area.width as usize - 2
                             ),
                             Style::new(T.info_column_fg, T.info_column_bg),

@@ -58,7 +58,10 @@ impl Buffer {
     }
 
     pub fn move_last_column(&mut self) {
-        self.move_cursor(self.cursor.y, self.get_line_max_cursor_x(self.cursor.y).unwrap());
+        self.move_cursor(
+            self.cursor.y,
+            self.get_line_max_cursor_x(self.cursor.y).unwrap(),
+        );
     }
 
     pub fn move_previous_word(&mut self) {
@@ -79,12 +82,10 @@ impl Buffer {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::{buffer::Buffer, core::rectangle::Rectangle};
+    use crate::{buffer::Buffer, core::size::Size};
 
     fn create_buffer() -> Buffer {
-        let mut area = Rectangle::<u16>::zero();
-        area.width = 8;
-        area.height = 5;
+        let area = Size::new(8, 5).to_rectangle();
         Buffer::new(area)
     }
 

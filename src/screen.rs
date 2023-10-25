@@ -43,10 +43,7 @@ impl Screen {
     }
 
     pub fn from(editor: &Editor) -> Self {
-        let mut screen = Screen::new(Size {
-            width: editor.area.width,
-            height: editor.area.height,
-        });
+        let mut screen = Screen::new(editor.area.to_size());
 
         screen.cursor_style = match editor.get_active_buffer_or_popup().mode {
             BufferMode::Normal => CursorStyle::BlinkingBlock,

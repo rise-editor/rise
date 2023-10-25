@@ -94,16 +94,11 @@ impl Buffer {
 
 #[cfg(test)]
 mod tests {
-    use crate::{buffer::Buffer, core::rectangle::Rectangle};
+    use crate::{buffer::Buffer, core::size::Size};
 
     #[test]
     fn test() {
-        let mut buffer = Buffer::new(Rectangle {
-            x: 0,
-            y: 0,
-            width: 10,
-            height: 10,
-        });
+        let mut buffer = Buffer::new(Size::new(10, 10).to_rectangle());
 
         buffer.lines.clear();
         buffer.lines.push(String::from("123 567 90"));

@@ -31,20 +31,14 @@ impl Terminal {
 
         Terminal {
             stdout,
-            screen: Screen::new(Size {
-                width: size.width,
-                height: size.height,
-            }),
+            screen: Screen::new(size),
         }
     }
 
     pub fn get_terminal_size() -> Result<Size<u16>> {
         let (columns, rows) = terminal::size()?;
 
-        Ok(Size {
-            width: columns,
-            height: rows,
-        })
+        Ok(Size::new(columns, rows))
     }
 }
 
@@ -149,10 +143,9 @@ impl Terminal {
 
         match event {
             event::Event::Key(key_event) => Ok(TerminalEvent::Key(key_event_to_key(key_event))),
-            event::Event::Resize(columns, rows) => Ok(TerminalEvent::Resize(Size {
-                width: columns,
-                height: rows,
-            })),
+            event::Event::Resize(columns, rows) => {
+                Ok(TerminalEvent::Resize(Size::new(columns, rows)))
+            }
             _ => todo!(),
         }
     }

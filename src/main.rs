@@ -19,7 +19,7 @@ use crate::{
 
 fn main() -> Result<()> {
     let terminal_size = Terminal::get_terminal_size()?;
-    let editor_area: Rectangle<u16> = Rectangle::<u16>::from_size(terminal_size);
+    let editor_area: Rectangle<u16> = terminal_size.to_rectangle();
 
     let mut editor = Editor::new(editor_area);
     let tab = editor.create_new_tab();
@@ -34,7 +34,7 @@ fn main() -> Result<()> {
 
     while let Ok(event) = terminal.read() {
         match event {
-            TerminalEvent::Resize(size) => editor.set_size(Rectangle::<u16>::from_size(size)),
+            TerminalEvent::Resize(size) => editor.set_size(size.to_rectangle()),
             TerminalEvent::Key(key) => {
                 if key.ctrl && key.code == String::from("c") {
                     break;

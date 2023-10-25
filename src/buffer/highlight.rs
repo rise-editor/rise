@@ -61,16 +61,11 @@ impl Buffer {
 mod tests {
     use crate::{
         buffer::{Buffer, Highlight},
-        core::rectangle::Rectangle,
+        core::size::Size,
     };
 
     fn test1(row: usize, start: usize, end: usize) -> bool {
-        let area = Rectangle {
-            x: 0,
-            y: 0,
-            width: 10,
-            height: 10,
-        };
+        let area = Size::new(10, 10).to_rectangle();
 
         let highlight = Highlight {
             name: "Test",
@@ -94,12 +89,7 @@ mod tests {
 
     #[test]
     fn clear_highlight_test() {
-        let mut buffer = Buffer::new(Rectangle {
-            x: 0,
-            y: 0,
-            width: 10,
-            height: 10,
-        });
+        let mut buffer = Buffer::new(Size::new(10, 10).to_rectangle());
 
         buffer.highlights.push(Highlight {
             name: "Foo",

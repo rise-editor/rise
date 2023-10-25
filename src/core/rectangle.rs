@@ -1,15 +1,23 @@
+use std::ops::{Add, Div, Mul, Sub};
+
 use crate::core::size::Size;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Rectangle<T> {
+pub struct Rectangle<T>
+where
+    T: Add + Sub + Mul + Div + Clone,
+{
     pub x: T,
     pub y: T,
     pub width: T,
     pub height: T,
 }
 
-impl<T> Rectangle<T> {
-    pub fn from(x: T, y: T, width: T, height: T) -> Self {
+impl<T> Rectangle<T>
+where
+    T: Add + Sub + Mul + Div + Clone + Default,
+{
+    pub fn new(x: T, y: T, width: T, height: T) -> Self {
         Self {
             x,
             y,
@@ -17,26 +25,29 @@ impl<T> Rectangle<T> {
             height,
         }
     }
-}
 
-impl<T: From<u16>> Rectangle<T> {
     pub fn zero() -> Self {
         Self {
-            x: 0.into(),
-            y: 0.into(),
-            width: 0.into(),
-            height: 0.into(),
+            x: T::default(),
+            y: T::default(),
+            width: T::default(),
+            height: T::default(),
         }
     }
-}
 
-impl<T: From<u16>> Rectangle<T> {
-    pub fn from_size(size: Size<T>) -> Self {
+    pub fn from_size(size: &Size<T>) -> Self {
         Self {
-            x: 0.into(),
-            y: 0.into(),
-            width: size.width,
-            height: size.height,
+            x: T::default(),
+            y: T::default(),
+            width: size.width.clone(),
+            height: size.height.clone(),
+        }
+    }
+
+    pub fn to_size(&self) -> Size<T> {
+        Size {
+            width: self.width.clone(),
+            height: self.height.clone(),
         }
     }
 }

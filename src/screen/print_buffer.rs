@@ -112,7 +112,7 @@ impl Screen {
                     self.print_text(
                         buffer.area.y + y,
                         buffer.text_area.x,
-                        &text,
+                        &buffer.options.replace_chars(&text),
                         Style::new(T.text_fg, T.text_bg),
                     );
                 }

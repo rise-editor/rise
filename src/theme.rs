@@ -16,6 +16,8 @@ pub struct Theme {
     pub text_bg: Color,
     pub text_selected_fg: Color,
     pub text_selected_bg: Color,
+    pub text_whitespace_fg: Color,
+    pub text_whitespace_bg: Color,
     pub text_finded_fg: Color,
     pub text_finded_bg: Color,
 
@@ -61,6 +63,8 @@ pub const THEME_ONE: Theme = Theme {
     text_bg: SILVER,
     text_selected_fg: WHITE,
     text_selected_bg: GRAY,
+    text_whitespace_fg: LIGHT_GRAY,
+    text_whitespace_bg: SILVER,
     text_finded_fg: RED,
     text_finded_bg: GRAY,
 

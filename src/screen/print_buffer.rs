@@ -109,11 +109,11 @@ impl Screen {
                             Style::new(T.info_column_fg, T.info_column_bg),
                         );
                     }
-                    self.print_text(
+                    self.print_buffer_text(
+                        &buffer.options.chars,
                         buffer.area.y + y,
                         buffer.text_area.x,
-                        &buffer.options.replace_chars(&text),
-                        Style::new(T.text_fg, T.text_bg),
+                        &text,
                     );
                 }
                 Err(_) => {

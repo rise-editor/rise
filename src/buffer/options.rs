@@ -17,19 +17,3 @@ impl Default for BufferOptions {
         options
     }
 }
-
-impl BufferOptions {
-    pub fn replace_chars(&self, text: &str) -> String {
-        let mut result = String::new();
-
-        for c in text.chars() {
-            if let Some(m) = self.chars.get(&c) {
-                result.push(m.clone());
-            } else {
-                result.push(c);
-            }
-        }
-
-        result
-    }
-}

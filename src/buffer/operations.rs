@@ -77,12 +77,14 @@ impl Buffer {
         let row = self.cursor.y;
         self.insert_line(row);
         self.move_cursor(row, 0);
+        self.enter_insert_mode();
     }
 
     pub fn open_new_line_next(&mut self) {
         let row = self.cursor.y + 1;
         self.insert_line(row);
         self.move_cursor(row, 0);
+        self.enter_insert_mode();
     }
 
     pub fn split_line(&mut self, row: usize, column: usize) -> Result<(), String> {

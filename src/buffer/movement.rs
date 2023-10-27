@@ -79,53 +79,53 @@ impl Buffer {
         self.move_cursor(new_position.y, new_position.x);
     }
 
+    pub fn scroll_to(&mut self, y: usize) {
+        if y < self.get_line_count() {
+            self.scroll.y = y;
+        } else {
+            self.scroll.y = self.get_line_count() - 1;
+        }
+
+        if self.cursor.y < self.scroll.y {
+            self.move_cursor(self.scroll.y, self.cursor.x);
+        }
+    }
+
     pub fn scroll_center(&mut self) {
         let half = (self.text_area.height / 2) as usize;
-        if self.cursor.y > half {
-            self.scroll.y = self.cursor.y - half;
+        let y = if self.cursor.y > half {
+            self.cursor.y - half
         } else {
-            self.scroll.y = 0;
-        }
+            0
+        };
+        self.scroll_to(y);
     }
 
     pub fn scroll_up(&mut self) {
         if self.scroll.y > 0 {
-            self.scroll.y -= 1;
-            if self.scroll.y + (self.text_area.height as usize) == self.cursor.y {
-                self.move_cursor(self.cursor.y - 1, self.cursor.x);
-            }
+            self.scroll_to(self.scroll.y - 1);
         }
     }
 
     pub fn scroll_up_half_page(&mut self) {
         let half = (self.text_area.height / 2) as usize;
-        if self.cursor.y > half {
-            self.move_cursor(self.cursor.y - half, self.cursor.x);
-            self.scroll_center();
+        let y = if self.cursor.y > half {
+            self.cursor.y - half
         } else {
-            self.move_cursor(0, self.cursor.x);
-        }
+            0
+        };
+        self.move_cursor(y, self.cursor.x);
+        self.scroll_center();
     }
 
     pub fn scroll_down(&mut self) {
-        if self.scroll.y < self.get_line_count() - 1 {
-            self.scroll.y += 1;
-            if self.scroll.y > self.cursor.y {
-                self.move_cursor(self.scroll.y, self.cursor.x);
-            }
-        }
+        self.scroll_to(self.scroll.y + 1);
     }
 
     pub fn scroll_down_half_page(&mut self) {
         let half = (self.text_area.height / 2) as usize;
-        let last_line = self.get_line_count() - 1;
-        if self.scroll.y > last_line - half {
-            self.scroll.y = last_line - half;
-            self.move_cursor(last_line, self.cursor.x);
-        } else {
-            self.move_cursor(self.cursor.y + half, self.cursor.x);
-            self.scroll_center();
-        }
+        self.move_cursor(self.cursor.y + half, self.cursor.x);
+        self.scroll_center();
     }
 }
 

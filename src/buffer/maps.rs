@@ -43,6 +43,7 @@ pub fn get_default_normal_maps() -> ActionMap {
     map.insert("N", buffer_action!(move_to_previous_find));
 
     // operations
+    map.insert("s", buffer_action!(substitute_char));
     map.insert("x", buffer_action!(delete_char));
     map.insert("J", buffer_action!(join_lines_cursor));
     map.insert("O", buffer_action!(open_new_line_previous));

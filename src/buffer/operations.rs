@@ -68,6 +68,11 @@ impl Buffer {
             .unwrap();
     }
 
+    pub fn substitute_char(&mut self) {
+        self.delete_char();
+        self.enter_insert_mode();
+    }
+
     fn insert_line(&mut self, row: usize) {
         self.lines.insert(row, String::new());
         self.set_size(self.area.clone());

@@ -16,6 +16,23 @@ impl Buffer {
         }
     }
 
+    pub fn paste_cursor(&mut self) {
+        if let Some(clipboard) = &self.clipboard {
+            let clipboard_text = clipboard.text.clone();
+            let lines = clipboard_text.split('\n');
+            let mut is_first = true;
+
+            for line in lines {
+                if is_first {
+                    is_first = false;
+                } else {
+                    self.split_line_after();
+                }
+                self.insert_str_cursor(line);
+            }
+        }
+    }
+
     pub fn paste_after(&mut self) {
         if let Some(clipboard) = &self.clipboard {
             let clipboard_text = clipboard.text.clone();
@@ -41,6 +58,21 @@ mod test {
         buffer::{clipboard::Clipboard, Buffer},
         core::{point::Point, size::Size},
     };
+
+    #[test]
+    fn paste_cursor_test() {
+        let mut buffer = Buffer::new(Size::new(10, 10).to_rectangle());
+        buffer.lines.clear();
+        buffer.lines = vec![String::from("12345"), String::from("67890")];
+        buffer.cursor = Point::new(1, 2);
+        buffer.clipboard = Some(Clipboard {
+            is_line: false,
+            text: String::from("123\n456\n789"),
+        });
+        buffer.paste_cursor();
+        let expected = String::from("12345\n67123\n456\n789890");
+        assert_eq!(expected, buffer.get_content());
+    }
 
     #[test]
     fn paste_after_test() {

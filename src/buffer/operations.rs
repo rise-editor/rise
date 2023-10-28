@@ -50,7 +50,7 @@ impl Buffer {
     }
 
     pub fn insert_str_cursor(&mut self, text: &str) {
-        self.insert_str_at(self.cursor.y, self.cursor.y, text)
+        self.insert_str_at(self.cursor.y, self.cursor.x, text)
             .unwrap()
     }
 

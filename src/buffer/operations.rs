@@ -35,6 +35,34 @@ impl Buffer {
         }
     }
 
+    pub fn insert_str_at(&mut self, row: usize, column: usize, text: &str) -> Result<(), String> {
+        let line = self.get_line_mut(row)?;
+        if column > line.len() {
+            return Err(format!(
+                "Can not insert str at {} (line: {})",
+                column,
+                row + 1
+            ));
+        }
+        line.insert_str(column, text);
+        self.move_cursor(row, column + text.len().checked_sub(1).unwrap_or(0));
+        Ok(())
+    }
+
+    pub fn insert_str_cursor(&mut self, text: &str) {
+        self.insert_str_at(self.cursor.y, self.cursor.y, text)
+            .unwrap()
+    }
+
+    pub fn insert_str_after(&mut self, text: &str) {
+        if self.get_current_line_text_length() == 0 {
+            self.insert_str_cursor(text);
+        } else {
+            self.insert_str_at(self.cursor.y, self.cursor.x + 1, text)
+                .unwrap();
+        }
+    }
+
     pub fn delete_char_from(&mut self, row: usize, column: usize) -> Result<(), String> {
         let line = self.get_line_mut(row)?;
         if line.len() == column {

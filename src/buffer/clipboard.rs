@@ -16,25 +16,19 @@ impl Buffer {
         }
     }
 
-    pub fn paste(&mut self) {
-        // TODO: Improve performance (add all text instead iterate chars)
+    pub fn paste_after(&mut self) {
         if let Some(clipboard) = &self.clipboard {
-            let mut new_line = false;
-            for c in clipboard.text.clone().chars() {
-                match c {
-                    '\n' => {
-                        self.split_line_after();
-                        new_line = true;
-                    }
-                    ch => {
-                        if new_line && self.cursor.x == 0 {
-                            self.insert_char(ch);
-                            self.move_left();
-                            new_line = false;
-                        } else {
-                            self.insert_char_after(ch);
-                        }
-                    }
+            let clipboard_text = clipboard.text.clone();
+            let lines = clipboard_text.split('\n');
+            let mut is_first = true;
+
+            for line in lines {
+                if is_first {
+                    self.insert_str_after(line);
+                    is_first = false;
+                } else {
+                    self.split_line_after();
+                    let _ = self.insert_str_at(self.cursor.y, 0, line);
                 }
             }
         }
@@ -49,7 +43,7 @@ mod test {
     };
 
     #[test]
-    fn paste_test() {
+    fn paste_after_test() {
         let mut buffer = Buffer::new(Size::new(10, 10).to_rectangle());
         buffer.lines.clear();
         buffer.lines = vec![String::from("12345"), String::from("67890")];
@@ -58,7 +52,7 @@ mod test {
             is_line: false,
             text: String::from("123\n456\n789"),
         });
-        buffer.paste();
+        buffer.paste_after();
         let expected = String::from("12345\n678123\n456\n78990");
         assert_eq!(expected, buffer.get_content());
     }

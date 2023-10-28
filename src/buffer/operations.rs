@@ -17,16 +17,16 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn insert_char(&mut self, ch: char) {
+    pub fn insert_char_at_cursor(&mut self, ch: char) {
         let row = self.cursor.y;
         let column = self.cursor.x;
         self.insert_char_to(row, column, ch).unwrap();
         self.move_cursor(row, column + 1);
     }
 
-    pub fn insert_char_after(&mut self, ch: char) {
+    pub fn insert_char_at_after_cursor(&mut self, ch: char) {
         if self.get_current_line_text_length() == 0 {
-            self.insert_char(ch);
+            self.insert_char_at_cursor(ch);
         } else {
             let row = self.cursor.y;
             let column = self.cursor.x + 1;
@@ -35,7 +35,7 @@ impl Buffer {
         }
     }
 
-    pub fn insert_str_at(&mut self, row: usize, column: usize, text: &str) -> Result<(), String> {
+    pub fn insert_str_to(&mut self, row: usize, column: usize, text: &str) -> Result<(), String> {
         let line = self.get_line_mut(row)?;
         if column > line.len() {
             return Err(format!(
@@ -49,16 +49,16 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn insert_str_cursor(&mut self, text: &str) {
-        self.insert_str_at(self.cursor.y, self.cursor.x, text)
+    pub fn insert_str_at_cursor(&mut self, text: &str) {
+        self.insert_str_to(self.cursor.y, self.cursor.x, text)
             .unwrap()
     }
 
-    pub fn insert_str_after(&mut self, text: &str) {
+    pub fn insert_str_at_after_cursor(&mut self, text: &str) {
         if self.get_current_line_text_length() == 0 {
-            self.insert_str_cursor(text);
+            self.insert_str_at_cursor(text);
         } else {
-            self.insert_str_at(self.cursor.y, self.cursor.x + 1, text)
+            self.insert_str_to(self.cursor.y, self.cursor.x + 1, text)
                 .unwrap();
         }
     }
@@ -80,11 +80,11 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn delete_char(&mut self) {
+    pub fn delete_char_from_cursor(&mut self) {
         self.delete_char_from(self.cursor.y, self.cursor.x).unwrap();
     }
 
-    pub fn delete_char_before(&mut self, row: usize, column: usize) -> Result<(), String> {
+    pub fn delete_previous_char_from(&mut self, row: usize, column: usize) -> Result<(), String> {
         if row == 0 && column == 0 {
             return Ok(());
         }
@@ -95,42 +95,42 @@ impl Buffer {
             self.join_lines(row - 1, row)?;
         } else {
             self.move_left();
-            self.delete_char();
+            self.delete_char_from_cursor();
         }
 
         Ok(())
     }
 
-    pub fn delete_char_before_cursor(&mut self) {
-        self.delete_char_before(self.cursor.y, self.cursor.x)
+    pub fn delete_previous_char_from_cursor(&mut self) {
+        self.delete_previous_char_from(self.cursor.y, self.cursor.x)
             .unwrap();
     }
 
-    pub fn substitute_char(&mut self) {
-        self.delete_char();
+    pub fn substitute_char_from_cursor(&mut self) {
+        self.delete_char_from_cursor();
         self.enter_insert_mode();
     }
 
-    fn insert_line(&mut self, row: usize) {
+    fn insert_line_at(&mut self, row: usize) {
         self.lines.insert(row, String::new());
         self.set_size(self.area.clone());
     }
 
     pub fn open_new_line_previous(&mut self) {
         let row = self.cursor.y;
-        self.insert_line(row);
+        self.insert_line_at(row);
         self.move_cursor(row, 0);
         self.enter_insert_mode();
     }
 
     pub fn open_new_line_next(&mut self) {
         let row = self.cursor.y + 1;
-        self.insert_line(row);
+        self.insert_line_at(row);
         self.move_cursor(row, 0);
         self.enter_insert_mode();
     }
 
-    pub fn split_line(&mut self, row: usize, column: usize) -> Result<(), String> {
+    pub fn split_line_at(&mut self, row: usize, column: usize) -> Result<(), String> {
         let line = self.get_line(row)?;
         if column > line.len() {
             return Err(format!("No column at {} (line: {})", column, row + 1));
@@ -149,15 +149,16 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn split_line_cursor(&mut self) {
-        self.split_line(self.cursor.y, self.cursor.x).unwrap();
+    pub fn split_line_at_cursor(&mut self) {
+        self.split_line_at(self.cursor.y, self.cursor.x).unwrap();
     }
 
-    pub fn split_line_after(&mut self) {
+    pub fn split_line_at_after_cursor(&mut self) {
         if self.get_current_line_text_length() == 0 {
-            self.split_line_cursor();
+            self.split_line_at_cursor();
         } else {
-            self.split_line(self.cursor.y, self.cursor.x + 1).unwrap();
+            self.split_line_at(self.cursor.y, self.cursor.x + 1)
+                .unwrap();
         }
     }
 

@@ -43,13 +43,13 @@ pub fn get_default_normal_maps() -> ActionMap {
     map.insert("N", buffer_action!(move_to_previous_find));
 
     // operations
-    map.insert("s", buffer_action!(substitute_char));
-    map.insert("x", buffer_action!(delete_char));
+    map.insert("s", buffer_action!(substitute_char_from_cursor));
+    map.insert("x", buffer_action!(delete_char_from_cursor));
     map.insert("J", buffer_action!(join_lines_cursor));
     map.insert("O", buffer_action!(open_new_line_previous));
     map.insert("o", buffer_action!(open_new_line_next));
-    map.insert("P", buffer_action!(paste_cursor));
-    map.insert("p", buffer_action!(paste_after));
+    map.insert("P", buffer_action!(paste_at_cursor));
+    map.insert("p", buffer_action!(paste_at_after_cursor));
 
     // modes
     map.insert("i", buffer_action!(enter_insert_mode));
@@ -106,10 +106,13 @@ pub fn get_default_insert_maps() -> ActionMap {
     let mut map: ActionMap = HashMap::new();
 
     map.insert("esc", buffer_action!(enter_normal_mode));
-    map.insert("enter", buffer_action!(split_line_cursor));
-    map.insert("backspace", buffer_action!(delete_char_before_cursor));
-    map.insert("delete", buffer_action!(delete_char));
-    map.insert("<c-j>", buffer_action!(split_line_cursor));
+    map.insert("enter", buffer_action!(split_line_at_cursor));
+    map.insert(
+        "backspace",
+        buffer_action!(delete_previous_char_from_cursor),
+    );
+    map.insert("delete", buffer_action!(delete_char_from_cursor));
+    map.insert("<c-j>", buffer_action!(split_line_at_cursor));
 
     map
 }

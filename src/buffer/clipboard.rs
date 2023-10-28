@@ -16,7 +16,7 @@ impl Buffer {
         }
     }
 
-    pub fn paste_cursor(&mut self) {
+    pub fn paste_at_cursor(&mut self) {
         if let Some(clipboard) = &self.clipboard {
             let clipboard_text = clipboard.text.clone();
             let lines = clipboard_text.split('\n');
@@ -26,14 +26,14 @@ impl Buffer {
                 if is_first {
                     is_first = false;
                 } else {
-                    self.split_line_after();
+                    self.split_line_at_after_cursor();
                 }
-                self.insert_str_cursor(line);
+                self.insert_str_at_cursor(line);
             }
         }
     }
 
-    pub fn paste_after(&mut self) {
+    pub fn paste_at_after_cursor(&mut self) {
         if let Some(clipboard) = &self.clipboard {
             let clipboard_text = clipboard.text.clone();
             let lines = clipboard_text.split('\n');
@@ -41,11 +41,11 @@ impl Buffer {
 
             for line in lines {
                 if is_first {
-                    self.insert_str_after(line);
+                    self.insert_str_at_after_cursor(line);
                     is_first = false;
                 } else {
-                    self.split_line_after();
-                    let _ = self.insert_str_at(self.cursor.y, 0, line);
+                    self.split_line_at_after_cursor();
+                    let _ = self.insert_str_to(self.cursor.y, 0, line);
                 }
             }
         }
@@ -69,7 +69,7 @@ mod test {
             is_line: false,
             text: String::from("123\n456\n789"),
         });
-        buffer.paste_cursor();
+        buffer.paste_at_cursor();
         let expected = String::from("12345\n67123\n456\n789890");
         assert_eq!(expected, buffer.get_content());
     }
@@ -84,7 +84,7 @@ mod test {
             is_line: false,
             text: String::from("123\n456\n789"),
         });
-        buffer.paste_after();
+        buffer.paste_at_after_cursor();
         let expected = String::from("12345\n678123\n456\n78990");
         assert_eq!(expected, buffer.get_content());
     }

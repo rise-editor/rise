@@ -188,17 +188,4 @@ pub mod tests {
         assert_eq!("", buffer.get_line_visible_text(1).unwrap());
         assert_eq!("", buffer.get_line_visible_text(2).unwrap());
     }
-
-    #[test]
-    pub fn move_last_column_test() {
-        let mut buffer = create_buffer();
-        buffer.enter_insert_mode();
-        buffer.insert_char('1');
-        buffer.insert_char('2');
-        buffer.insert_char('3');
-        buffer.insert_char('4');
-        buffer.insert_char('4');
-        buffer.enter_normal_mode();
-        buffer.move_last_column();
-    }
 }

@@ -77,6 +77,10 @@ pub fn get_default_visual_maps() -> ActionMap {
     map.insert("k", buffer_action!(move_up));
     map.insert("l", buffer_action!(move_right));
 
+    map.insert("w", buffer_action!(move_next_word));
+    map.insert("e", buffer_action!(move_next_word_end));
+    map.insert("b", buffer_action!(move_previous_word));
+
     map.insert("o", buffer_action!(reverse_selection));
 
     map.insert("y", buffer_action!(copy_selection));

@@ -1,12 +1,6 @@
 use crate::buffer::Buffer;
 
 impl Buffer {
-    pub fn insert_char(&mut self, ch: char) {
-        let row = self.cursor.y;
-        let column = self.cursor.x;
-        self.insert_char_to(row, column, ch).unwrap();
-    }
-
     pub fn insert_char_to(&mut self, row: usize, column: usize, ch: char) -> Result<(), String> {
         let line = self.get_line_mut(row)?;
 
@@ -20,13 +14,25 @@ impl Buffer {
 
         line.insert(column, ch);
 
-        self.move_cursor(row, column + 1);
-
         Ok(())
     }
 
-    pub fn delete_char(&mut self) {
-        self.delete_char_from(self.cursor.y, self.cursor.x).unwrap();
+    pub fn insert_char(&mut self, ch: char) {
+        let row = self.cursor.y;
+        let column = self.cursor.x;
+        self.insert_char_to(row, column, ch).unwrap();
+        self.move_cursor(row, column + 1);
+    }
+
+    pub fn insert_char_after(&mut self, ch: char) {
+        if self.get_current_line_text_length() == 0 {
+            self.insert_char(ch);
+        } else {
+            let row = self.cursor.y;
+            let column = self.cursor.x + 1;
+            self.insert_char_to(row, column, ch).unwrap();
+            self.move_cursor(row, column);
+        }
     }
 
     pub fn delete_char_from(&mut self, row: usize, column: usize) -> Result<(), String> {
@@ -44,6 +50,10 @@ impl Buffer {
         }
 
         Ok(())
+    }
+
+    pub fn delete_char(&mut self) {
+        self.delete_char_from(self.cursor.y, self.cursor.x).unwrap();
     }
 
     pub fn delete_char_before(&mut self, row: usize, column: usize) -> Result<(), String> {

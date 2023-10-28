@@ -48,6 +48,7 @@ pub fn get_default_normal_maps() -> ActionMap {
     map.insert("J", buffer_action!(join_lines_cursor));
     map.insert("O", buffer_action!(open_new_line_previous));
     map.insert("o", buffer_action!(open_new_line_next));
+    map.insert("p", buffer_action!(paste));
 
     // modes
     map.insert("i", buffer_action!(enter_insert_mode));
@@ -77,6 +78,8 @@ pub fn get_default_visual_maps() -> ActionMap {
     map.insert("l", buffer_action!(move_right));
 
     map.insert("o", buffer_action!(reverse_selection));
+
+    map.insert("y", buffer_action!(copy_selection));
 
     map
 }

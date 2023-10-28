@@ -5,3 +5,4 @@ pub mod rectangle;
 pub mod size;
 pub mod style;
 pub mod text_position;
+pub mod text_reader;

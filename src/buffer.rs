@@ -1,3 +1,4 @@
+pub mod clipboard;
 pub mod find;
 pub mod helper;
 pub mod highlight;
@@ -14,6 +15,7 @@ use std::collections::HashMap;
 
 use crate::{
     buffer::{
+        clipboard::Clipboard,
         highlight::Highlight,
         maps::{get_default_insert_maps, get_default_normal_maps, get_default_visual_maps},
         mode::BufferMode,
@@ -45,6 +47,7 @@ pub struct Buffer {
     pub styles: HashMap<&'static str, Style>,
     pub highlights: Vec<Highlight>,
     pub finds: Vec<TextPosition>,
+    pub clipboard: Option<Clipboard>,
 }
 
 impl Buffer {
@@ -70,6 +73,7 @@ impl Buffer {
             styles: HashMap::new(),
             highlights: vec![],
             finds: vec![],
+            clipboard: None,
         };
         buffer.set_static_highlights();
         buffer.set_size(area);

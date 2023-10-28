@@ -1,4 +1,7 @@
-use crate::buffer::Buffer;
+use crate::{
+    buffer::Buffer,
+    core::{point::Point, text_reader::TextReader},
+};
 
 impl Buffer {
     pub fn get_line(&self, row: usize) -> Result<&String, String> {
@@ -54,5 +57,58 @@ impl Buffer {
         self.lines = content.split('\n').map(|x| String::from(x)).collect();
         self.move_cursor(0, 0);
         self.set_size(self.area.clone());
+    }
+
+    pub fn get_text(&self, location1: Point<usize>, location2: Point<usize>) -> String {
+        let (from, to) = if location1 < location2 {
+            (location1.clone(), location2.clone())
+        } else {
+            (location2.clone(), location1.clone())
+        };
+
+        let mut result: Vec<String> = Vec::new();
+
+        let mut reader = TextReader::new(&self.lines);
+        let _ = reader.set_cursor(from);
+
+        while reader.get_cursor() <= to {
+            let mut line = String::new();
+            if let Some(ch) = reader.get_char() {
+                line.push(ch);
+            }
+            while !reader.is_line_last_x() && reader.get_cursor() <= to {
+                if let Some(ch) = reader.next() {
+                    line.push(ch);
+                }
+            }
+            result.push(line);
+            reader.next();
+        }
+
+        result.join("\n")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        buffer::Buffer,
+        core::{point::Point, size::Size},
+    };
+
+    #[test]
+    fn get_text_test() {
+        let mut buffer = Buffer::new(Size::new(10, 10).to_rectangle());
+        buffer.lines.clear();
+        buffer.lines.push(String::from("123456"));
+        buffer.lines.push(String::from("qwerty"));
+        buffer.lines.push(String::from(""));
+        buffer.lines.push(String::from("qwe"));
+
+        let lines = buffer.get_text(Point::new(0, 3), Point::new(3, 1));
+        let lines2 = buffer.get_text(Point::new(3, 1), Point::new(0, 3));
+
+        assert_eq!("456\nqwerty\n\nqw", lines);
+        assert_eq!("456\nqwerty\n\nqw", lines2);
     }
 }

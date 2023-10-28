@@ -60,11 +60,7 @@ impl Buffer {
     }
 
     pub fn get_text(&self, location1: Point<usize>, location2: Point<usize>) -> String {
-        let (from, to) = if location1 < location2 {
-            (location1.clone(), location2.clone())
-        } else {
-            (location2.clone(), location1.clone())
-        };
+        let (from, to) = Point::order(location1, location2);
 
         let mut result: Vec<String> = Vec::new();
 

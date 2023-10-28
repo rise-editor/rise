@@ -55,29 +55,18 @@ impl Buffer {
         }
 
         if let BufferMode::Visual = self.mode {
-            let mut reader = TextReader::new(&self.lines);
-            let (from, to) = if self.selection.start < self.cursor {
-                (self.selection.start.clone(), self.cursor.clone())
-            } else {
-                (self.cursor.clone(), self.selection.start.clone())
-            };
-            let _ = reader.set_cursor(from);
+            let reader = TextReader::new(&self.lines);
+            let selections =
+                reader.get_text_positions(self.selection.start.clone(), self.cursor.clone());
 
-            while reader.get_cursor() <= to {
-                let mut highlight = Highlight {
+            for selection in selections.iter() {
+                let highlight = Highlight {
                     name: HL_SELECTED_TEXT,
-                    row: reader.get_cursor_y(),
-                    start: reader.get_cursor_x(),
-                    end: reader.get_cursor_x(),
+                    row: selection.row,
+                    start: selection.start,
+                    end: selection.end,
                 };
-                while !reader.is_line_last_x() && reader.get_cursor() < to {
-                    let _ = reader.next();
-                    if reader.get_cursor() <= to {
-                        highlight.end += 1;
-                    }
-                }
                 list.push(highlight);
-                let _ = reader.next();
             }
         }
 

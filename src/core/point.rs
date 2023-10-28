@@ -12,6 +12,16 @@ impl<T> Point<T> {
     }
 }
 
+impl<T: PartialOrd> Point<T> {
+    pub fn order(p1: Point<T>, p2: Point<T>) -> (Self, Self) {
+        if p1 <= p2 {
+            (p1, p2)
+        } else {
+            (p2, p1)
+        }
+    }
+}
+
 impl<T: PartialOrd> PartialOrd for Point<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self.y < other.y {

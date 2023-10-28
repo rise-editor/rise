@@ -1,4 +1,4 @@
-use crate::core::point::Point;
+use crate::core::{point::Point, text_position::TextPosition};
 
 pub struct TextReader<'a> {
     cursor: Point<usize>,
@@ -81,6 +81,28 @@ impl<'a> TextReader<'a> {
 
     pub fn is_text_last_x(&self) -> bool {
         self.cursor.y + 1 == self.lines.len() && self.is_line_last_x()
+    }
+
+    pub fn get_text_positions(&self, p1: Point<usize>, p2: Point<usize>) -> Vec<TextPosition> {
+        let (from, to) = Point::order(p1, p2);
+
+        let mut result: Vec<TextPosition> = Vec::new();
+
+        for y in from.y..(to.y + 1) {
+            let x1 = if from.y == y { from.x } else { 0 };
+            let x2 = if to.y == y {
+                to.x
+            } else {
+                self.get_line_last_x(y)
+            };
+            result.push(TextPosition {
+                row: y,
+                start: x1,
+                end: x2,
+            });
+        }
+
+        result
     }
 }
 

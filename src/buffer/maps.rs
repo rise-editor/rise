@@ -86,6 +86,14 @@ pub fn get_default_visual_maps() -> ActionMap {
     map.insert("e", buffer_action!(move_next_word_end));
     map.insert("b", buffer_action!(move_previous_word));
 
+    map.insert("<c-y>", buffer_action!(scroll_up));
+    map.insert("<c-u>", buffer_action!(scroll_up_half_page));
+    map.insert("<c-e>", buffer_action!(scroll_down));
+    map.insert("<c-d>", buffer_action!(scroll_down_half_page));
+
+    map.insert("n", buffer_action!(move_to_next_find));
+    map.insert("N", buffer_action!(move_to_previous_find));
+
     map.insert("o", buffer_action!(reverse_selection));
 
     map.insert("y", buffer_action!(copy_selection));

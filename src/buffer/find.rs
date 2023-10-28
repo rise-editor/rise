@@ -50,11 +50,7 @@ impl Buffer {
 
         let mut pos: Option<TextPosition> = None;
         for find in self.finds.iter() {
-            if find.row < self.cursor.y {
-                continue;
-            } else if find.row == self.cursor.y && find.start <= self.cursor.x {
-                continue;
-            } else {
+            if find.get_start_point() > self.cursor {
                 pos = Some(find.clone());
                 break;
             }
@@ -74,11 +70,7 @@ impl Buffer {
 
         let mut pos: Option<TextPosition> = None;
         for find in self.finds.iter().rev() {
-            if self.cursor.y < find.row {
-                continue;
-            } else if find.row == self.cursor.y && self.cursor.x <= find.start {
-                continue;
-            } else {
+            if self.cursor > find.get_end_point() {
                 pos = Some(find.clone());
                 break;
             }

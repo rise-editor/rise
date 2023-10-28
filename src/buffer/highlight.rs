@@ -70,9 +70,11 @@ impl Buffer {
                     start: reader.get_cursor_x(),
                     end: reader.get_cursor_x(),
                 };
-                while reader.get_cursor() <= to && !reader.is_line_last_x() {
+                while !reader.is_line_last_x() && reader.get_cursor() < to {
                     let _ = reader.next();
-                    highlight.end += 1;
+                    if reader.get_cursor() <= to {
+                        highlight.end += 1;
+                    }
                 }
                 list.push(highlight);
                 let _ = reader.next();

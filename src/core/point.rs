@@ -17,6 +17,8 @@ impl<T: PartialOrd> PartialOrd for Point<T> {
         if self.y < other.y {
             Some(Ordering::Less)
         } else if self.y == other.y && self.x < other.x {
+            Some(Ordering::Less)
+        } else if self == other {
             Some(Ordering::Equal)
         } else {
             Some(Ordering::Greater)

@@ -15,7 +15,7 @@ impl<'a> TextReader<'a> {
 
     pub fn set_cursor(&mut self, cursor: Point<usize>) -> Result<(), String> {
         if cursor.y < self.lines.len() {
-            if self.cursor.x < self.lines.get(cursor.y).unwrap().len() {
+            if cursor.x <= self.get_line_last_x(cursor.y) {
                 self.cursor = cursor;
                 return Ok(());
             }
@@ -127,5 +127,7 @@ mod tests {
         assert_eq!(None, reader.next());
         assert_eq!(Some('e'), reader.previous());
         assert_eq!(Some('d'), reader.previous());
+
+        assert_eq!(Ok(()), reader.set_cursor(Point::new(1, 0)));
     }
 }

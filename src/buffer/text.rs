@@ -76,7 +76,7 @@ impl Buffer {
             if let Some(ch) = reader.get_char() {
                 line.push(ch);
             }
-            while !reader.is_line_last_x() && reader.get_cursor() <= to {
+            while !reader.is_line_last_x() && reader.get_cursor() < to {
                 if let Some(ch) = reader.next() {
                     line.push(ch);
                 }

@@ -125,6 +125,10 @@ impl Buffer {
         self.split_line(self.cursor.y, self.cursor.x).unwrap();
     }
 
+    pub fn split_line_after(&mut self) {
+        self.split_line(self.cursor.y, self.cursor.x + 1).unwrap();
+    }
+
     pub fn join_lines(&mut self, row1: usize, row2: usize) -> Result<(), String> {
         let line2 = self.get_line(row2)?.clone();
         let line1 = self.get_line_mut(row1)?;

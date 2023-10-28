@@ -75,7 +75,7 @@ impl Buffer {
             finds: vec![],
             clipboard: None,
         };
-        buffer.set_static_highlights();
+        buffer.set_default_styles();
         buffer.set_size(area);
         buffer
     }

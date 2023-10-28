@@ -1,6 +1,6 @@
 use crate::{
-    buffer::Buffer,
-    core::{rectangle::Rectangle, style::Style},
+    buffer::{mode::BufferMode, Buffer},
+    core::{rectangle::Rectangle, style::Style, text_reader::TextReader},
     theme::THEME_ONE as T,
 };
 
@@ -14,6 +14,7 @@ pub struct Highlight {
 pub const HL_CURRENT_LINE: &str = "CurrentLine";
 pub const HL_CURRENT_LINE_TEXT: &str = "CurrentLineText";
 pub const HL_FIND_TEXT: &str = "FindText";
+pub const HL_SELECTED_TEXT: &str = "SelectedText";
 
 impl Highlight {
     pub fn is_visible_in_area(&self, area: Rectangle<usize>) -> bool {
@@ -25,9 +26,13 @@ impl Highlight {
 }
 
 impl Buffer {
-    pub fn set_static_highlights(&mut self) {
+    pub fn set_default_styles(&mut self) {
         self.styles
             .insert(HL_FIND_TEXT, Style::new(T.text_finded_fg, T.text_finded_bg));
+        self.styles.insert(
+            HL_SELECTED_TEXT,
+            Style::new(T.text_selected_fg, T.text_selected_bg),
+        );
     }
 
     pub fn get_dynamic_highlights(&self) -> Vec<Highlight> {
@@ -47,6 +52,31 @@ impl Buffer {
                 start: 0,
                 end,
             });
+        }
+
+        if let BufferMode::Visual = self.mode {
+            let mut reader = TextReader::new(&self.lines);
+            let (from, to) = if self.selection.start < self.cursor {
+                (self.selection.start.clone(), self.cursor.clone())
+            } else {
+                (self.cursor.clone(), self.selection.start.clone())
+            };
+            let _ = reader.set_cursor(from);
+
+            while reader.get_cursor() <= to {
+                let mut highlight = Highlight {
+                    name: HL_SELECTED_TEXT,
+                    row: reader.get_cursor_y(),
+                    start: reader.get_cursor_x(),
+                    end: reader.get_cursor_x(),
+                };
+                while reader.get_cursor() <= to && !reader.is_line_last_x() {
+                    let _ = reader.next();
+                    highlight.end += 1;
+                }
+                list.push(highlight);
+                let _ = reader.next();
+            }
         }
 
         list

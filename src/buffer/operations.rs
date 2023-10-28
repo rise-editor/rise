@@ -154,7 +154,11 @@ impl Buffer {
     }
 
     pub fn split_line_after(&mut self) {
-        self.split_line(self.cursor.y, self.cursor.x + 1).unwrap();
+        if self.get_current_line_text_length() == 0 {
+            self.split_line_cursor();
+        } else {
+            self.split_line(self.cursor.y, self.cursor.x + 1).unwrap();
+        }
     }
 
     pub fn join_lines(&mut self, row1: usize, row2: usize) -> Result<(), String> {

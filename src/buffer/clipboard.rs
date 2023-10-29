@@ -45,7 +45,7 @@ impl Buffer {
                     is_first = false;
                 } else {
                     self.split_line_at_after_cursor();
-                    let _ = self.insert_str_to(self.cursor.y, 0, line);
+                    self.insert_str_at_cursor(line);
                 }
             }
         }

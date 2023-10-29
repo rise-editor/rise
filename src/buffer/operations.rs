@@ -45,22 +45,33 @@ impl Buffer {
             ));
         }
         line.insert_str(column, text);
-        self.move_cursor(row, column + text.len().checked_sub(1).unwrap_or(0));
         Ok(())
     }
 
     pub fn insert_str_at_cursor(&mut self, text: &str) {
-        self.insert_str_to(self.cursor.y, self.cursor.x, text)
-            .unwrap()
+        let row = self.cursor.y;
+        let column = self.cursor.x;
+        self.insert_str_to(row, column, text).unwrap();
+        self.move_cursor(row, column + text.len().checked_sub(1).unwrap_or(0));
     }
 
     pub fn insert_str_at_after_cursor(&mut self, text: &str) {
         if self.get_current_line_text_length() == 0 {
             self.insert_str_at_cursor(text);
         } else {
-            self.insert_str_to(self.cursor.y, self.cursor.x + 1, text)
-                .unwrap();
+            let row = self.cursor.y;
+            let column = self.cursor.x;
+            self.insert_str_to(row, column + 1, text).unwrap();
+            self.move_cursor(row, column + text.len());
         }
+    }
+
+    pub fn insert_whitespace_at_cursor(&mut self) {
+        let row = self.cursor.y;
+        let column = self.cursor.x;
+        let text = self.options.get_whitespace_chars();
+        self.insert_str_to(row, column, &text).unwrap();
+        self.move_cursor(self.cursor.y, column + text.len());
     }
 
     pub fn delete_char_from(&mut self, row: usize, column: usize) -> Result<(), String> {

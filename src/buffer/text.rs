@@ -65,7 +65,7 @@ impl Buffer {
         let mut result: Vec<String> = Vec::new();
 
         let mut reader = TextReader::new(&self.lines);
-        let _ = reader.set_cursor(from);
+        reader.set_cursor(from).unwrap();
 
         while reader.get_cursor() <= to {
             let mut line = String::new();

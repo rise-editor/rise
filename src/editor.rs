@@ -112,7 +112,10 @@ impl Editor {
             BufferMode::Insert => match buffer.actions_insert.get(&key.to_string().as_str()) {
                 Some(action) => action(self),
                 None => {
-                    if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
+                    if key.to_string() == "tab" {
+                        self.get_active_buffer_or_popup_mut()
+                            .insert_whitespace_at_cursor();
+                    } else if !key.ctrl && !key.win && !key.alt && key.code.len() == 1 {
                         let ch = key.code.chars().nth(0).unwrap();
                         buffer.insert_char_at_cursor(ch);
                     }
